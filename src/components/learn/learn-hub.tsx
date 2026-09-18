@@ -252,6 +252,13 @@ function ProblemsStage({ completed }: { completed: string[] }) {
       </div>
       <p className="mt-2 text-sm leading-6 text-muted-foreground">{stage.blurb}</p>
       <p className="mt-1 text-sm font-medium text-foreground">{stage.cue}</p>
+      <div className="mt-4 rounded-xl border border-primary/25 bg-primary/5 px-4 py-3 text-sm leading-6">
+        <span className="font-medium">New here? </span>
+        <span className="text-muted-foreground">
+          Follow the order below. Each studio starts with only a client, so you
+          build the design yourself. “Coach me” breaks it into four small moves.
+        </span>
+      </div>
       <ul className="mt-5 divide-y divide-border rounded-2xl border border-border bg-card">
         {PRACTICE_PROBLEMS.map((problem, index) => {
           const complete = completed.includes(problem.id);
@@ -275,7 +282,7 @@ function ProblemsStage({ completed }: { completed: string[] }) {
                   <span className="min-w-0">
                     <span className="block text-sm font-medium">{problem.title}</span>
                     <span className="block truncate text-xs text-muted-foreground">
-                      {problem.product} · {problem.minutes} min · {problem.deepDive}
+                      {problem.product} · {problem.minutes} min · 4 guided moves
                     </span>
                   </span>
                 </span>

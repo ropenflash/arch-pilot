@@ -90,7 +90,7 @@ export const PRODUCT = {
   ],
   examplesHeadline: "Design these systems",
   examplesLead:
-    "The interviewer prompt is already written. You scope v1, size it, and draw the board — rate limiter through video and cloud files.",
+    "Twelve written interview problems, each with four guided moves, nudges, trade-offs, a reference approach, and a failure drill.",
   formLead:
     "Describe the system as you would to a principal architect, then generate an architecture — or start on a blank canvas and design the diagram yourself. Optional scale fields make capacity math deterministic.",
   reviewEmpty:

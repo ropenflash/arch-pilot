@@ -62,8 +62,8 @@ export const COURSE_STAGES: CourseStage[] = [
     number: 4,
     title: "Design these systems",
     blurb:
-      "The prompts are already written. You are the candidate: scope v1, size it, draw the board. Start with a rate limiter; finish with files and video.",
-    cue: "Do not invent a brief. Pick a system and design it.",
+      "The prompts are already written. Every system has four friendly build moves, specific nudges, a reference approach, trade-offs, and a failure drill.",
+    cue: "Start with the rate limiter. Draw first, ask the coach when you get stuck, then explain your choices.",
     moduleIds: [],
   },
 ];

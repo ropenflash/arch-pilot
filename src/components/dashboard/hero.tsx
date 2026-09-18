@@ -159,7 +159,7 @@ export function ExampleGrid() {
               <span className="text-border">·</span>
               <span>{problem.product}</span>
               <span className="text-border">·</span>
-              <span>~{problem.minutes} min</span>
+              <span>4 guided moves</span>
             </div>
             <h3 className="mt-3 text-sm font-medium text-foreground">
               {problem.title}

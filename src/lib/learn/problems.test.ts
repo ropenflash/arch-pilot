@@ -10,6 +10,7 @@ import {
   starterForProblem,
 } from "@/lib/learn/problems";
 import { parseProblemProgress } from "@/lib/learn/problem-progress";
+import { getProblemGuide, PROBLEM_GUIDES } from "@/lib/learn/problem-guides";
 
 describe("practice systems", () => {
   it("covers the interview index as original prompts, not a book reprint", () => {
@@ -52,6 +53,29 @@ describe("practice systems", () => {
     design = addComponent(design, "cache");
     expect(evaluateChecks(design, limiter.checks).passed).toBe(true);
     expect(problemHref("url-shortener")).toBe("/learn/problems/url-shortener");
+  });
+
+  it("gives every system a four-step coach and reference approach", () => {
+    expect(Object.keys(PROBLEM_GUIDES).sort()).toEqual(
+      PRACTICE_PROBLEMS.map((problem) => problem.id).sort(),
+    );
+    for (const problem of PRACTICE_PROBLEMS) {
+      const guide = getProblemGuide(problem.id);
+      expect(guide.concept.length, problem.id).toBeGreaterThan(40);
+      expect(guide.steps, problem.id).toHaveLength(4);
+      expect(
+        guide.steps.every(
+          (step) =>
+            step.goal.length > 20 &&
+            step.questions.length >= 2 &&
+            step.nudge.length > 20,
+        ),
+        problem.id,
+      ).toBe(true);
+      expect(guide.referenceFlow.length, problem.id).toBeGreaterThan(50);
+      expect(guide.decisions.length, problem.id).toBeGreaterThanOrEqual(3);
+      expect(guide.failureDrill.length, problem.id).toBeGreaterThan(40);
+    }
   });
 
   it("parses saved problem progress", () => {

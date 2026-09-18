@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useMemo, useState, useSyncExternalStore } from "react";
-import { Check, Lightbulb } from "lucide-react";
+import { BookOpen, Check, ChevronRight, Lightbulb } from "lucide-react";
 import { ArchitectureStudio } from "@/components/architecture/architecture-studio";
 import { LearnPathHeader } from "@/components/learn/learn-chrome";
 import { Button } from "@/components/ui/button";
 import { evaluateChecks } from "@/lib/learn/grade";
+import { getProblemGuide } from "@/lib/learn/problem-guides";
 import {
   PRACTICE_PROBLEMS,
   getProblem,
@@ -28,6 +29,7 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
   const index = PRACTICE_PROBLEMS.findIndex((item) => item.id === problem.id);
   const next = PRACTICE_PROBLEMS[index + 1];
   const prev = PRACTICE_PROBLEMS[index - 1];
+  const guide = getProblemGuide(problem.id);
 
   const snapshot = useSyncExternalStore(
     subscribeProblemProgress,
@@ -46,6 +48,8 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
   const [design, setDesign] = useState<SystemDesign>(() => starterForProblem(problem));
   const [checked, setChecked] = useState(false);
   const [hint, setHint] = useState(false);
+  const [coachOpen, setCoachOpen] = useState(false);
+  const [guideStep, setGuideStep] = useState(0);
   const grade = useMemo(() => evaluateChecks(design, problem.checks), [design, problem]);
   const done = progress.completed.includes(problem.id);
 
@@ -78,6 +82,120 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
             ))}
           </ul>
 
+          <section className="mt-5 rounded-xl border border-primary/25 bg-primary/5 p-3">
+            <button
+              type="button"
+              onClick={() => setCoachOpen((open) => !open)}
+              className="flex w-full items-center justify-between gap-3 text-left"
+              aria-expanded={coachOpen}
+            >
+              <span>
+                <span className="flex items-center gap-2 text-sm font-semibold">
+                  <BookOpen className="h-4 w-4 text-primary" />
+                  Learn as you build
+                </span>
+                <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                  Four small moves. Open this whenever the blank board feels too big.
+                </span>
+              </span>
+              <ChevronRight
+                className={cn(
+                  "h-4 w-4 shrink-0 transition-transform",
+                  coachOpen && "rotate-90",
+                )}
+              />
+            </button>
+
+            {coachOpen ? (
+              <div className="mt-4 border-t border-primary/20 pt-4">
+                <p className="text-sm leading-6 text-muted-foreground">{guide.concept}</p>
+                <ol className="mt-3 grid grid-cols-4 gap-1">
+                  {guide.steps.map((step, stepIndex) => (
+                    <li key={step.title}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setGuideStep(stepIndex);
+                          setHint(false);
+                        }}
+                        className={cn(
+                          "w-full rounded-lg border px-1 py-2 text-center text-xs font-medium",
+                          guideStep === stepIndex
+                            ? "border-primary bg-background text-foreground"
+                            : "border-transparent text-muted-foreground hover:text-foreground",
+                        )}
+                        aria-label={`Step ${stepIndex + 1}: ${step.title}`}
+                      >
+                        {stepIndex + 1}
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+                <div className="mt-3 rounded-lg bg-background p-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
+                    Step {guideStep + 1} · {guide.steps[guideStep]!.title}
+                  </p>
+                  <p className="mt-2 text-sm font-medium leading-5">
+                    {guide.steps[guideStep]!.goal}
+                  </p>
+                  <ul className="mt-2 list-disc space-y-1 pl-4 text-xs leading-5 text-muted-foreground">
+                    {guide.steps[guideStep]!.questions.map((question) => (
+                      <li key={question}>{question}</li>
+                    ))}
+                  </ul>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setHint((shown) => !shown)}
+                    >
+                      <Lightbulb className="h-3.5 w-3.5" />
+                      {hint ? "Hide nudge" : "Give me a nudge"}
+                    </Button>
+                    {guideStep < guide.steps.length - 1 ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setGuideStep((step) => step + 1);
+                          setHint(false);
+                        }}
+                        className="text-xs font-medium text-primary hover:underline"
+                      >
+                        Next move →
+                      </button>
+                    ) : null}
+                  </div>
+                  {hint ? (
+                    <p className="mt-3 rounded-lg border border-dashed border-primary/40 px-3 py-2 text-xs leading-5 text-muted-foreground">
+                      <Lightbulb className="mr-1 inline h-3.5 w-3.5 text-primary" />
+                      {guide.steps[guideStep]!.nudge}
+                    </p>
+                  ) : null}
+                </div>
+
+                <details className="mt-3 rounded-lg border border-border bg-background px-3 py-2">
+                  <summary className="cursor-pointer text-xs font-semibold">
+                    Compare with a reference approach
+                  </summary>
+                  <p className="mt-3 text-xs leading-5 text-muted-foreground">
+                    {guide.referenceFlow}
+                  </p>
+                  <p className="mt-3 text-xs font-semibold">Decisions to explain</p>
+                  <ul className="mt-1 list-disc space-y-1 pl-4 text-xs leading-5 text-muted-foreground">
+                    {guide.decisions.map((decision) => (
+                      <li key={decision}>{decision}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-3 text-xs font-semibold">Failure drill</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {guide.failureDrill}
+                  </p>
+                </details>
+              </div>
+            ) : null}
+          </section>
+
           <p className="mt-4 text-sm leading-6">
             <span className="font-medium">Scale to say out loud. </span>
             <span className="text-muted-foreground">{problem.scale}</span>
@@ -109,14 +227,6 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
             ))}
           </ul>
 
-          {hint ? (
-            <p className="mt-4 rounded-xl border border-dashed border-primary/40 px-3 py-2 text-sm leading-6 text-muted-foreground">
-              <Lightbulb className="mr-1 inline h-4 w-4 text-primary" />
-              Use the hour: scope v1, draw boxes, napkin-check QPS, then zoom the
-              risky path. Do not invent extra products.
-            </p>
-          ) : null}
-
           <div className="mt-5 flex flex-wrap gap-2">
             <Button type="button" variant={grade.passed ? "secondary" : "default"} onClick={() => setChecked(true)}>
               Check my board
@@ -127,8 +237,15 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
                 <Check className="h-4 w-4" />
               </Button>
             ) : (
-              <Button type="button" variant="outline" onClick={() => setHint(true)}>
-                Need a hint?
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setCoachOpen(true);
+                  setHint(true);
+                }}
+              >
+                Coach me
               </Button>
             )}
           </div>
