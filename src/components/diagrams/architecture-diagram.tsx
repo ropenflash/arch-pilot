@@ -19,6 +19,7 @@ import {
 import { toPng } from "html-to-image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useTheme } from "next-themes";
 import { ArchitectureNode, NODE_ICONS } from "@/components/diagrams/architecture-node";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,7 +44,6 @@ import { cn } from "@/lib/utils";
 import {
   Download,
   Focus,
-  GripVertical,
   Map as MapIcon,
   MoveHorizontal,
   MoveVertical,
@@ -53,7 +53,18 @@ import {
 const PALETTE_MIME = "application/archpilot-node";
 const nodeTypes = { architecture: ArchitectureNode };
 
-function decorateEdges(edges: Edge[]): Edge[] {
+function canvasColors(isDark: boolean) {
+  return {
+    stroke: isDark ? "#a8a29e" : "#78716c",
+    label: isDark ? "#fafafa" : "#1c1917",
+    labelBg: isDark ? "#121214" : "#ffffff",
+    png: isDark ? "#121214" : "#fafaf9",
+    dots: isDark ? "#3f3f46" : "#d6d3d1",
+  };
+}
+
+function decorateEdges(edges: Edge[], isDark: boolean): Edge[] {
+  const colors = canvasColors(isDark);
   return edges.map((edge) => ({
     ...edge,
     type: "smoothstep",
@@ -61,20 +72,20 @@ function decorateEdges(edges: Edge[]): Edge[] {
       type: MarkerType.ArrowClosed,
       width: 18,
       height: 18,
-      color: "#71717a",
+      color: colors.stroke,
     },
-    style: { stroke: "#52525b", strokeWidth: 1.6 },
-    labelStyle: { fill: "#a1a1aa", fontSize: 11, fontWeight: 500 },
-    labelBgStyle: { fill: "#09090b", fillOpacity: 0.92 },
+    style: { stroke: colors.stroke, strokeWidth: 2 },
+    labelStyle: { fill: colors.label, fontSize: 12, fontWeight: 600 },
+    labelBgStyle: { fill: colors.labelBg, fillOpacity: 0.95 },
     labelBgPadding: [4, 6] as [number, number],
     labelBgBorderRadius: 4,
     interactionWidth: 24,
   }));
 }
 
-function graphFromDesign(design: SystemDesign, layout: boolean) {
+function graphFromDesign(design: SystemDesign, layout: boolean, isDark: boolean) {
   const graph = toReactFlowGraph(design, { layout });
-  return { nodes: graph.nodes, edges: decorateEdges(graph.edges) };
+  return { nodes: graph.nodes, edges: decorateEdges(graph.edges, isDark) };
 }
 
 function DiagramInner({
@@ -82,24 +93,28 @@ function DiagramInner({
   onSelect,
   onDesignChange,
   readOnly,
+  highlightTypes = [],
 }: {
   design: SystemDesign;
   onSelect: (selection: CanvasSelection | null) => void;
   onDesignChange?: (design: SystemDesign) => void;
   readOnly: boolean;
+  highlightTypes?: ArchitectureNodeType[];
 }) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const designRef = useRef(design);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const seededLayout = useRef(false);
   const initial = useMemo(
-    () => graphFromDesign(design, !hasStoredPositions(design)),
+    () => graphFromDesign(design, !hasStoredPositions(design), isDark),
     // Mount-only; parent remounts via canvasKey after regenerate.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
   const [nodes, setNodes, onNodesChange] = useNodesState(initial.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initial.edges);
-  const [showMinimap, setShowMinimap] = useState(true);
+  const [showMinimap, setShowMinimap] = useState(false);
   const { fitView, getNodes, screenToFlowPosition } = useReactFlow();
   const editable = !readOnly && Boolean(onDesignChange);
 
@@ -107,20 +122,23 @@ function DiagramInner({
     (next: SystemDesign) => {
       designRef.current = next;
       onDesignChange?.(next);
-      const graph = graphFromDesign(next, false);
+      const graph = graphFromDesign(next, false, isDark);
       setNodes(graph.nodes);
       setEdges(graph.edges);
     },
-    [onDesignChange, setEdges, setNodes],
+    [isDark, onDesignChange, setEdges, setNodes],
   );
 
   useEffect(() => {
-    if (design === designRef.current) return;
+    if (design === designRef.current) {
+      setEdges((current) => decorateEdges(current, isDark));
+      return;
+    }
     designRef.current = design;
-    const graph = graphFromDesign(design, !hasStoredPositions(design));
+    const graph = graphFromDesign(design, !hasStoredPositions(design), isDark);
     setNodes(graph.nodes);
     setEdges(graph.edges);
-  }, [design, setEdges, setNodes]);
+  }, [design, isDark, setEdges, setNodes]);
 
   useEffect(() => {
     if (!editable || seededLayout.current) return;
@@ -244,7 +262,7 @@ function DiagramInner({
     if (!editable) {
       const next = layoutGraph(nodes, edges, direction);
       setNodes(next.nodes);
-      setEdges(decorateEdges(next.edges));
+      setEdges(decorateEdges(next.edges, isDark));
       window.setTimeout(() => fitView({ padding: 0.18 }), 20);
       return;
     }
@@ -258,7 +276,7 @@ function DiagramInner({
     ) as HTMLElement | null;
     if (!viewport) return;
     const dataUrl = await toPng(viewport, {
-      backgroundColor: "#09090b",
+      backgroundColor: canvasColors(isDark).png,
       pixelRatio: 2,
     });
     const link = document.createElement("a");
@@ -277,10 +295,10 @@ function DiagramInner({
 
   return (
     <div className="flex h-full min-h-[560px] flex-col">
-      <div className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-border bg-muted/60 px-3 py-2.5">
         <Button size="sm" variant="secondary" onClick={() => fitView({ padding: 0.18 })}>
           <Focus className="h-3.5 w-3.5" />
-          Fit
+          Fit view
         </Button>
         <Button
           size="sm"
@@ -306,22 +324,23 @@ function DiagramInner({
         ) : null}
         <Button size="sm" variant="secondary" onClick={downloadPng}>
           <Download className="h-3.5 w-3.5" />
-          PNG
+          Export PNG
         </Button>
-        <p className="ml-auto hidden text-[11px] text-zinc-500 sm:block">
+        <p className="ml-auto hidden max-w-sm text-[13px] leading-5 text-muted-foreground lg:block">
           {editable
-            ? "Drag from the palette. Connect handles. Click a node to edit."
+            ? "Add from the left. Drag to place. Connect the dots. Click a box to edit."
             : "Read-only diagram. Pan, zoom, and export."}
         </p>
       </div>
       <div className="flex min-h-0 flex-1">
         {editable ? (
-          <aside className="flex w-[132px] shrink-0 flex-col gap-1 overflow-y-auto border-r border-border p-2">
-            <p className="px-1 pb-1 text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-              Add
+          <aside className="flex w-[176px] shrink-0 flex-col gap-0.5 overflow-y-auto border-r border-border bg-muted/40 p-2">
+            <p className="px-2 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Add component
             </p>
             {COMPONENT_PALETTE.map((item) => {
               const Icon = NODE_ICONS[item.type];
+              const highlighted = highlightTypes.includes(item.type);
               return (
                 <button
                   key={item.type}
@@ -332,11 +351,15 @@ function DiagramInner({
                     event.dataTransfer.effectAllowed = "move";
                   }}
                   onClick={() => addAt(item.type)}
-                  className="flex items-center gap-1.5 rounded-md border border-transparent px-1.5 py-1 text-left text-[11px] text-zinc-300 hover:border-border hover:bg-zinc-900"
+                  className={cn(
+                    "flex items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] font-medium hover:bg-accent",
+                    highlighted
+                      ? "bg-primary/10 text-foreground ring-1 ring-primary/40"
+                      : "text-foreground",
+                  )}
                 >
-                  <GripVertical className="h-3 w-3 shrink-0 text-zinc-600" />
-                  <Icon className="h-3.5 w-3.5 shrink-0 text-zinc-400" />
-                  <span className="truncate">{item.label}</span>
+                  <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  <span>{item.label}</span>
                 </button>
               );
             })}
@@ -361,19 +384,19 @@ function DiagramInner({
               onSelect({ kind: "edge", from: edge.source, to: edge.target })
             }
             onPaneClick={() => onSelect(null)}
-            onInit={(instance) => instance.fitView({ padding: 0.18 })}
+            onInit={(instance) => instance.fitView({ padding: 0.2 })}
             nodesDraggable={editable}
             nodesConnectable={editable}
             edgesReconnectable={false}
             elementsSelectable
             deleteKeyCode={editable ? ["Backspace", "Delete"] : null}
             connectionMode={ConnectionMode.Loose}
-            colorMode="dark"
+            colorMode={isDark ? "dark" : "light"}
             defaultEdgeOptions={{
               type: "smoothstep",
               markerEnd: {
                 type: MarkerType.ArrowClosed,
-                color: "#71717a",
+                color: canvasColors(isDark).stroke,
                 width: 18,
                 height: 18,
               },
@@ -383,14 +406,14 @@ function DiagramInner({
             maxZoom={1.8}
             proOptions={{ hideAttribution: true }}
           >
-            <Background gap={22} color="#1f1f23" />
-            <Controls />
+            <Background gap={24} color={canvasColors(isDark).dots} />
+            <Controls showInteractive={false} />
             {showMinimap ? (
               <MiniMap
                 pannable
                 zoomable
-                maskColor="rgba(9,9,11,0.7)"
-                nodeColor="#3f3f46"
+                maskColor={isDark ? "rgba(18,18,22,0.75)" : "rgba(250,250,249,0.75)"}
+                nodeColor={isDark ? "#71717a" : "#d6d3d1"}
               />
             ) : null}
           </ReactFlow>
@@ -406,17 +429,24 @@ export function ArchitectureDiagram({
   onDesignChange,
   readOnly = false,
   canvasKey,
+  highlightTypes,
+  compact = false,
 }: {
   design: SystemDesign;
   onSelect: (selection: CanvasSelection | null) => void;
   onDesignChange?: (design: SystemDesign) => void;
   readOnly?: boolean;
   canvasKey?: string | number;
+  highlightTypes?: ArchitectureNodeType[];
+  compact?: boolean;
 }) {
   return (
     <div
       className={cn(
-        "h-[min(720px,calc(100vh-220px))] min-h-[560px] overflow-hidden rounded-xl border border-border bg-zinc-950",
+        "overflow-hidden rounded-xl border border-border bg-background",
+        compact
+          ? "h-[min(720px,calc(100vh-140px))] min-h-[520px]"
+          : "h-[min(760px,calc(100vh-200px))] min-h-[580px]",
       )}
     >
       <ReactFlowProvider>
@@ -426,6 +456,7 @@ export function ArchitectureDiagram({
           onSelect={onSelect}
           onDesignChange={onDesignChange}
           readOnly={readOnly}
+          highlightTypes={highlightTypes}
         />
       </ReactFlowProvider>
     </div>

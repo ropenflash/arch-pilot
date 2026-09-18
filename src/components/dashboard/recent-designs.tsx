@@ -11,7 +11,7 @@ export async function RecentDesigns() {
         <h2 className="mb-4 text-lg font-medium">Recent Designs</h2>
         <p className="rounded-xl border border-border px-4 py-8 text-sm text-muted-foreground">
           Unable to load projects. Check that PostgreSQL is running and
-          <code className="mx-1 rounded bg-zinc-900 px-1">DATABASE_URL</code>
+          <code className="mx-1 rounded bg-muted px-1">DATABASE_URL</code>
           is set.
         </p>
       </section>
@@ -24,7 +24,7 @@ export async function RecentDesigns() {
         <h2 className="mb-4 text-lg font-medium">Recent Designs</h2>
         <p className="rounded-xl border border-dashed border-border px-4 py-8 text-sm text-muted-foreground">
           No projects yet. Generate a design or seed examples with{" "}
-          <code className="rounded bg-zinc-900 px-1">npx prisma db seed</code>.
+          <code className="rounded bg-muted px-1">npx prisma db seed</code>.
         </p>
       </section>
     );
@@ -38,7 +38,7 @@ export async function RecentDesigns() {
           <Link
             key={project.id}
             href={`/projects/${project.id}`}
-            className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-zinc-900/60"
+            className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-muted/60"
           >
             <div>
               <p className="text-sm font-medium">{project.name}</p>
@@ -46,7 +46,7 @@ export async function RecentDesigns() {
                 {project.description}
               </p>
             </div>
-            <span className="shrink-0 text-xs text-zinc-500">
+            <span className="shrink-0 text-xs text-foreground0">
               {new Date(project.updatedAt).toLocaleDateString()}
             </span>
           </Link>

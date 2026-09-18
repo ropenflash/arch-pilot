@@ -28,15 +28,15 @@ export function FailuresPanel({ design }: { design: SystemDesign }) {
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-wider text-zinc-500">{label}</p>
-      <p className="mt-1 leading-6 text-zinc-300">{value}</p>
+      <p className="text-[11px] uppercase tracking-wider text-foreground0">{label}</p>
+      <p className="mt-1 leading-6 text-muted-foreground">{value}</p>
     </div>
   );
 }
 
 export function SecurityPanel({ design }: { design: SystemDesign }) {
   return (
-    <ul className="list-disc space-y-2 pl-5 text-sm leading-6 text-zinc-300">
+    <ul className="list-disc space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
       {design.securityConsiderations.map((item) => (
         <li key={item}>{item}</li>
       ))}
@@ -59,7 +59,7 @@ export function ObservabilityPanel({ design }: { design: SystemDesign }) {
             <CardTitle>{group.title}</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="list-disc space-y-1 pl-4 text-sm text-zinc-300">
+            <ul className="list-disc space-y-1 pl-4 text-sm text-muted-foreground">
               {group.items.map((item) => (
                 <li key={item}>{item}</li>
               ))}

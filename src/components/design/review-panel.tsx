@@ -14,7 +14,7 @@ export function ReviewPanel({ review }: { review: ArchitectureReview | null }) {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm leading-7 text-zinc-300">{review.summary}</p>
+      <p className="text-sm leading-7 text-muted-foreground">{review.summary}</p>
       <div className="space-y-3">
         {review.findings.map((finding) => (
           <Card key={finding.title}>
@@ -26,9 +26,9 @@ export function ReviewPanel({ review }: { review: ArchitectureReview | null }) {
               <CardTitle className="text-base">{finding.title}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              <p className="text-zinc-300">{finding.explanation}</p>
+              <p className="text-muted-foreground">{finding.explanation}</p>
               <p>
-                <span className="text-zinc-500">Recommendation · </span>
+                <span className="text-foreground0">Recommendation · </span>
                 {finding.recommendation}
               </p>
             </CardContent>
@@ -47,7 +47,7 @@ function List({ title, items }: { title: string; items: string[] }) {
   return (
     <div>
       <h3 className="mb-2 text-sm font-medium">{title}</h3>
-      <ul className="list-disc space-y-1 pl-4 text-sm text-zinc-300">
+      <ul className="list-disc space-y-1 pl-4 text-sm text-muted-foreground">
         {items.map((item) => (
           <li key={item}>{item}</li>
         ))}

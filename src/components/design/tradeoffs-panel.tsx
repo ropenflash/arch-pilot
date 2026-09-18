@@ -11,21 +11,21 @@ export function TradeoffsPanel({ design }: { design: SystemDesign }) {
         design.tradeoffs.map((item) => (
           <Card key={item.decision}>
             <CardHeader>
-              <p className="text-[11px] uppercase tracking-wider text-zinc-500">Decision</p>
+              <p className="text-[11px] uppercase tracking-wider text-foreground0">Decision</p>
               <CardTitle className="text-base">{item.decision}</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3 text-sm md:grid-cols-3">
               <div>
-                <p className="text-zinc-500">Benefit</p>
-                <p className="mt-1 text-zinc-300">{item.benefit}</p>
+                <p className="text-foreground0">Benefit</p>
+                <p className="mt-1 text-muted-foreground">{item.benefit}</p>
               </div>
               <div>
-                <p className="text-zinc-500">Cost</p>
-                <p className="mt-1 text-zinc-300">{item.cost}</p>
+                <p className="text-foreground0">Cost</p>
+                <p className="mt-1 text-muted-foreground">{item.cost}</p>
               </div>
               <div>
-                <p className="text-zinc-500">When to reconsider</p>
-                <p className="mt-1 text-zinc-300">{item.whenToReconsider}</p>
+                <p className="text-foreground0">When to reconsider</p>
+                <p className="mt-1 text-muted-foreground">{item.whenToReconsider}</p>
               </div>
             </CardContent>
           </Card>
@@ -48,15 +48,15 @@ export function TechnologyDecisions({ design }: { design: SystemDesign }) {
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <p>
-                <span className="text-zinc-500">Why: </span>
+                <span className="text-foreground0">Why: </span>
                 {item.why}
               </p>
               <p>
-                <span className="text-zinc-500">Alternative: </span>
+                <span className="text-foreground0">Alternative: </span>
                 {item.alternative}
               </p>
               <p>
-                <span className="text-zinc-500">Why not: </span>
+                <span className="text-foreground0">Why not: </span>
                 {item.whyNot}
               </p>
             </CardContent>

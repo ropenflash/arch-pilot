@@ -18,8 +18,8 @@ export interface ArchitectureNodeData extends Record<string, unknown> {
 
 export type ArchitectureFlowNode = Node<ArchitectureNodeData, "architecture">;
 
-const NODE_WIDTH = 220;
-const NODE_HEIGHT = 86;
+const NODE_WIDTH = 248;
+const NODE_HEIGHT = 96;
 
 const RANK: Record<ArchitectureNodeType, number> = {
   client: 0,
@@ -101,7 +101,7 @@ export function toReactFlowGraph(
     id: component.id,
     type: "architecture",
     position: componentPosition(component, index, options.positions),
-    style: { width: 220, padding: 0, background: "transparent", border: "none" },
+    style: { width: 248, padding: 0, background: "transparent", border: "none" },
     data: {
       label: component.name,
       nodeType: component.type,
