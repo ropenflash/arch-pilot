@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowDown, ArrowRight, Check, RotateCcw, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowDown, ArrowRight, Check, X } from "lucide-react";
+import { RateLimiterAlgorithmPlayground } from "@/components/learn/rate-limiter-algorithm-playground";
 import type { RateLimiterDiagram } from "@/lib/learn/rate-limiter-course";
 import { cn } from "@/lib/utils";
 
@@ -211,7 +211,7 @@ const ALGORITHMS = [
 function AlgorithmLab() {
   return (
     <div className="space-y-5">
-      <TokenBucketLab />
+      <RateLimiterAlgorithmPlayground />
       <Frame
         title="Choose by behavior"
         caption="There is no universal winner. Match the algorithm to the traffic shape and product promise."
@@ -242,100 +242,6 @@ function AlgorithmLab() {
         </div>
       </Frame>
     </div>
-  );
-}
-
-function TokenBucketLab() {
-  const capacity = 5;
-  const [tokens, setTokens] = useState(3);
-  const [last, setLast] = useState<"idle" | "allowed" | "rejected">("idle");
-
-  function request() {
-    if (tokens > 0) {
-      setTokens((value) => value - 1);
-      setLast("allowed");
-    } else {
-      setLast("rejected");
-    }
-  }
-
-  function refill() {
-    setTokens((value) => Math.min(capacity, value + 1));
-    setLast("idle");
-  }
-
-  return (
-    <Frame
-      title="Try a token bucket"
-      caption="Capacity = 5. A request spends one token; refill adds one without overflowing the bucket."
-    >
-      <div className="grid items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-            Available tokens
-          </p>
-          <div className="mt-3 flex min-h-12 flex-wrap gap-2">
-            {Array.from({ length: capacity }, (_, index) => (
-              <span
-                key={index}
-                className={cn(
-                  "h-9 w-9 rounded-full border transition-all",
-                  index < tokens
-                    ? "border-primary bg-primary shadow-sm"
-                    : "border-dashed border-border bg-muted/40",
-                )}
-                aria-label={index < tokens ? "available token" : "empty slot"}
-              />
-            ))}
-          </div>
-          <p className="mt-3 font-mono text-sm">
-            {tokens} / {capacity} tokens
-          </p>
-        </div>
-        <ArrowRight className="hidden h-6 w-6 text-primary md:block" />
-        <div
-          className={cn(
-            "rounded-xl border p-4",
-            last === "allowed" && "border-emerald-500/30 bg-emerald-500/10",
-            last === "rejected" && "border-red-500/30 bg-red-500/10",
-            last === "idle" && "border-border bg-muted/40",
-          )}
-        >
-          <p className="text-sm font-semibold">
-            {last === "allowed"
-              ? "Allowed → API"
-              : last === "rejected"
-                ? "Rejected → 429"
-                : "Send a request"}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {last === "rejected"
-              ? "No token was available. The protected service sees no work."
-              : "A short burst is possible only while saved tokens remain."}
-          </p>
-        </div>
-      </div>
-      <div className="mt-5 flex flex-wrap gap-2">
-        <Button type="button" size="sm" onClick={request}>
-          Send request
-        </Button>
-        <Button type="button" size="sm" variant="outline" onClick={refill}>
-          Refill +1
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          onClick={() => {
-            setTokens(3);
-            setLast("idle");
-          }}
-        >
-          <RotateCcw className="h-3.5 w-3.5" />
-          Reset
-        </Button>
-      </div>
-    </Frame>
   );
 }
 
