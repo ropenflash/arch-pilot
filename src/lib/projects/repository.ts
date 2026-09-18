@@ -10,6 +10,16 @@ import {
 import { HttpError } from "@/lib/api/http";
 import type { Prisma } from "@prisma/client";
 
+function assertDatabase() {
+  if (!process.env.DATABASE_URL) {
+    throw new HttpError(
+      "INTERNAL_ERROR",
+      "Database is not configured. Add DATABASE_URL (Neon Postgres on Vercel).",
+      503,
+    );
+  }
+}
+
 export interface ProjectRecord {
   id: string;
   name: string;
@@ -49,6 +59,7 @@ function parseProject(row: {
 }
 
 export async function listProjects(): Promise<ProjectRecord[]> {
+  assertDatabase();
   const rows = await prisma.project.findMany({
     orderBy: { updatedAt: "desc" },
   });
@@ -56,6 +67,7 @@ export async function listProjects(): Promise<ProjectRecord[]> {
 }
 
 export async function getProject(id: string): Promise<ProjectRecord> {
+  assertDatabase();
   const row = await prisma.project.findUnique({ where: { id } });
   if (!row) {
     throw new HttpError("NOT_FOUND", "Project not found.", 404);
@@ -70,6 +82,7 @@ export async function createProject(data: {
   design: SystemDesign;
   review?: ArchitectureReview | null;
 }): Promise<ProjectRecord> {
+  assertDatabase();
   const row = await prisma.project.create({
     data: {
       name: data.name,
@@ -92,6 +105,7 @@ export async function updateProject(
     review: ArchitectureReview | null;
   }>,
 ): Promise<ProjectRecord> {
+  assertDatabase();
   await getProject(id);
   const row = await prisma.project.update({
     where: { id },
@@ -111,6 +125,7 @@ export async function updateProject(
 }
 
 export async function deleteProject(id: string): Promise<void> {
+  assertDatabase();
   await getProject(id);
   await prisma.project.delete({ where: { id } });
 }

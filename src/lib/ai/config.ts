@@ -21,8 +21,16 @@ export interface AIRuntimeConfig {
 
 export function getAIRuntimeConfig(): AIRuntimeConfig {
   const providerRaw = (process.env.AI_PROVIDER ?? "ollama").trim().toLowerCase();
+  const openaiKey = requiredEnv("OPENAI_API_KEY");
+  const preferOpenAIOnVercel =
+    Boolean(process.env.VERCEL) &&
+    providerRaw === "ollama" &&
+    Boolean(openaiKey);
+
   const provider: AIProviderKind =
-    providerRaw === "openai" || providerRaw === "openai-compatible"
+    preferOpenAIOnVercel ||
+    providerRaw === "openai" ||
+    providerRaw === "openai-compatible"
       ? "openai"
       : "ollama";
 

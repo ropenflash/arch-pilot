@@ -172,6 +172,31 @@ npm run db:seed
 
 `.env` is gitignored. Commit `.env.example` only.
 
+## Deploy on Vercel
+
+ArchPilot is a Next.js app. Production needs PostgreSQL (`DATABASE_URL`). Local Ollama is not available on Vercel; set an OpenAI-compatible provider for generation, or use the seeded example designs without a model.
+
+1. Import the GitHub repo at [vercel.com/new](https://vercel.com/new).
+2. Add Neon Postgres from the Vercel Marketplace (this injects `DATABASE_URL`).
+3. Set environment variables for Production and Preview:
+
+```env
+AI_PROVIDER="openai"
+OPENAI_API_KEY="..."
+OPENAI_BASE_URL="https://api.openai.com/v1"
+OPENAI_MODEL="gpt-4o-mini"
+```
+
+4. Deploy. The build runs `prisma migrate deploy && next build`.
+5. Seed examples once against production:
+
+```bash
+vercel env pull .env.production.local --environment production --yes
+DATABASE_URL="$(grep '^DATABASE_URL=' .env.production.local | cut -d= -f2- | tr -d '"')" npx prisma db seed
+```
+
+If `OPENAI_API_KEY` is set on Vercel, ArchPilot uses the OpenAI-compatible provider even when `AI_PROVIDER=ollama`.
+
 ## API documentation
 
 All errors use:
