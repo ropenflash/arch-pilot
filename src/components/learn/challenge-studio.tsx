@@ -6,6 +6,7 @@ import { useMemo, useState, useSyncExternalStore } from "react";
 import {
   ArrowLeft,
   ArrowRight,
+  BookOpen,
   Check,
   Lightbulb,
   RotateCcw,
@@ -22,6 +23,7 @@ import {
   type LearnStep,
   type QuizStep,
 } from "@/lib/learn/campaign";
+import { lessonForPractice } from "@/lib/learn/syllabus";
 import {
   defaultLearnProgress,
   parseLearnProgress,
@@ -72,6 +74,7 @@ export function ChallengeStudio({ stepId: routeStepId }: { stepId: string }) {
     [stored, stepId],
   );
   const step = getStep(progress.stepId);
+  const relatedLesson = lessonForPractice(step.id);
   const design = useMemo(
     () => designFor(step, progress.design),
     [progress.design, step],
@@ -172,11 +175,22 @@ export function ChallengeStudio({ stepId: routeStepId }: { stepId: string }) {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
-          All rounds
+          Syllabus
         </Link>
-        <p className="text-sm font-medium text-muted-foreground">
-          Round {index + 1} of {total}
-        </p>
+        <div className="flex items-center gap-3">
+          {relatedLesson ? (
+            <Link
+              href={`/learn/lessons/${relatedLesson.slug}`}
+              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+            >
+              <BookOpen className="h-4 w-4" />
+              Read the lesson
+            </Link>
+          ) : null}
+          <p className="text-sm font-medium text-muted-foreground">
+            Round {index + 1} of {total}
+          </p>
+        </div>
       </div>
 
       <div className="mb-6">

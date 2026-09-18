@@ -9,7 +9,7 @@ export const PRODUCT = {
     "Describe the system as you would to a principal architect. ArchPilot returns requirements, deterministic capacity math, a component architecture, APIs, a data model, trade-offs, failure scenarios, an interactive diagram, and a skeptical review — the decisions that come before the code.",
   primaryCta: "Create System Design",
   secondaryCta: "View Examples",
-  learnCta: "Play architecture",
+  learnCta: "Learn the path",
   learnKicker: "Guided practice",
   whyHeadline: "Why ArchPilot?",
   whyLead:
