@@ -11,6 +11,11 @@ import {
 } from "@/lib/learn/problems";
 import { parseProblemProgress } from "@/lib/learn/problem-progress";
 import { getProblemGuide, PROBLEM_GUIDES } from "@/lib/learn/problem-guides";
+import {
+  RATE_LIMITER_SECTIONS,
+  getRateLimiterSection,
+  rateLimiterLessonHref,
+} from "@/lib/learn/rate-limiter-course";
 
 describe("practice systems", () => {
   it("covers the interview index as original prompts, not a book reprint", () => {
@@ -103,5 +108,40 @@ describe("course stages", () => {
     expect(practiceFor(getLesson("cache-layer")!)?.href).toBe("/learn/from-zero/cache");
     expect(practiceFor(getLesson("napkin-qps")!)?.href).toBe("/learn/estimate/lumen");
     expect(practiceFor(getLesson("wrap-the-session")!)?.href).toBe("/learn/approach/wrap");
+  });
+});
+
+describe("rate limiter course", () => {
+  it("evolves from requirements to an operated distributed service", () => {
+    expect(RATE_LIMITER_SECTIONS.map((section) => section.id)).toEqual([
+      "scope",
+      "placement",
+      "algorithms",
+      "single-node",
+      "distributed",
+      "operations",
+    ]);
+    expect(RATE_LIMITER_SECTIONS.every((section) => section.intro.length >= 2)).toBe(true);
+    expect(RATE_LIMITER_SECTIONS.every((section) => section.keyPoints.length >= 4)).toBe(
+      true,
+    );
+    expect(
+      RATE_LIMITER_SECTIONS.every((section) =>
+        section.checkpoint.choices.some((choice) => choice.correct),
+      ),
+    ).toBe(true);
+    expect(getRateLimiterSection("algorithms")?.keyPoints).toHaveLength(5);
+    expect(rateLimiterLessonHref()).toBe(
+      "/learn/problems/rate-limiter/learn/scope",
+    );
+  });
+
+  it("uses the chapter pattern without copying its figures or distinctive text", () => {
+    const content = JSON.stringify(RATE_LIMITER_SECTIONS);
+    expect(content).not.toMatch(/figure 4-/i);
+    expect(content).not.toMatch(/twitter/i);
+    expect(content).not.toMatch(/lyft/i);
+    expect(content).not.toMatch(/shopify/i);
+    expect(content).not.toMatch(/cloudflare/i);
   });
 });

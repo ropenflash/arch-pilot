@@ -8,6 +8,7 @@ import { LearnPathHeader } from "@/components/learn/learn-chrome";
 import { Button } from "@/components/ui/button";
 import { evaluateChecks } from "@/lib/learn/grade";
 import { getProblemGuide } from "@/lib/learn/problem-guides";
+import { rateLimiterLessonHref } from "@/lib/learn/rate-limiter-course";
 import {
   PRACTICE_PROBLEMS,
   getProblem,
@@ -72,6 +73,15 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
           </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight">{problem.title}</h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">{problem.prompt}</p>
+
+          {problem.id === "rate-limiter" ? (
+            <Button asChild variant="secondary" className="mt-4 w-full">
+              <Link href={rateLimiterLessonHref()}>
+                <BookOpen className="h-4 w-4" />
+                Learn it step by step first
+              </Link>
+            </Button>
+          ) : null}
 
           <h2 className="mt-5 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
             v1 — only this
