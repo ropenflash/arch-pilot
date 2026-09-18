@@ -62,7 +62,7 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
       />
 
       <div className="grid items-start gap-5 xl:grid-cols-[minmax(300px,380px)_minmax(0,1fr)]">
-        <aside className="rounded-2xl border border-border bg-card p-5">
+        <aside className="rounded-2xl border border-border bg-card p-5 xl:sticky xl:top-20 xl:max-h-[calc(100vh-6.5rem)] xl:overflow-y-auto">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
             {problem.product} · ~{problem.minutes} min
           </p>
@@ -138,7 +138,7 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
             </p>
           ) : null}
 
-          <div className="mt-6 flex justify-between text-sm">
+          <div className="mt-6 flex justify-between gap-3 border-t border-border pt-4 text-sm">
             {prev ? (
               <Link href={problemHref(prev.id)} className="text-muted-foreground hover:text-foreground">
                 ← {prev.title}
