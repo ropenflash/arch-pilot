@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buildCapacityBreakdown } from "@/lib/capacity/calculations";
@@ -13,9 +14,27 @@ export function CapacityPanel({
   input: SystemDesignInput;
 }) {
   const breakdown = buildCapacityBreakdown(input, design);
+  const steps = [
+    breakdown.dau != null && breakdown.requestsPerUserPerDay != null
+      ? `Daily requests = ${fmt(breakdown.dau, 0)} DAU × ${fmt(breakdown.requestsPerUserPerDay, 0)} requests/user = ${fmt(breakdown.dailyRequests, 0)}`
+      : null,
+    breakdown.dailyRequests != null
+      ? `Average RPS = daily requests ÷ 86,400 = ${fmt(breakdown.averageRps ?? breakdown.averageRpsRounded, 0)}`
+      : null,
+    breakdown.peakMultiplier != null
+      ? `Peak RPS = average × ${breakdown.peakMultiplier}× busy hour = ${fmt(breakdown.peakRpsFromRoundedAverage ?? breakdown.peakRps, 0)}`
+      : null,
+    breakdown.storagePerDayGb != null
+      ? `Storage ≈ ${formatNumber(breakdown.storagePerDayGb, 2)} GB/day, ${formatNumber(breakdown.storagePerYearTb ?? 0, 2)} TB/year`
+      : null,
+    breakdown.bandwidthMbps != null
+      ? `Busy-hour pipe ≈ ${formatNumber(breakdown.bandwidthMbps, 1)} Mbps`
+      : null,
+  ].filter((item): item is string => Boolean(item));
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <h2 className="text-base font-semibold text-foreground">Capacity estimation</h2>
         <Badge variant="outline">
           {breakdown.source === "calculated"
@@ -53,6 +72,29 @@ export function CapacityPanel({
           }
         />
       </div>
+      {steps.length ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Napkin walkthrough</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm leading-6 text-muted-foreground">
+            <ol className="list-decimal space-y-1 pl-5">
+              {steps.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ol>
+            <p>
+              <Link href="/learn/estimate" className="font-medium text-primary hover:underline">
+                Practice napkin math
+              </Link>
+              {" · "}
+              <Link href="/learn/approach" className="font-medium text-primary hover:underline">
+                Interview approach
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
       <Card>
         <CardHeader>
           <CardTitle>Formulas</CardTitle>
@@ -73,7 +115,7 @@ export function CapacityPanel({
         </CardContent>
       </Card>
       {breakdown.notes.length ? (
-        <ul className="list-disc space-y-1 pl-5 text-xs text-amber-200/80">
+        <ul className="list-disc space-y-1 pl-5 text-xs text-muted-foreground">
           {breakdown.notes.map((note) => (
             <li key={note}>{note}</li>
           ))}

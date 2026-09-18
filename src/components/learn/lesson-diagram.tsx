@@ -34,6 +34,11 @@ const DIAGRAMS: Record<Lesson["diagram"], { rows: string[][]; accent?: string }>
   queue: { rows: [["Web servers (enqueue)"], ["Queue"], ["Workers"]] },
   shards: { rows: [["App servers"], ["Shard A   ·   Shard B   ·   Shard C"]] },
   ops: { rows: [["The running system"], ["Metrics · logs · traces · CI"]] },
+  units: { rows: [["8 bits → 1 byte"], ["2¹⁰ ≈ thousand (KiB)"], ["2³⁰ ≈ billion (GiB)"]] },
+  latency: { rows: [["CPU / RAM (ns–µs)"], ["SSD / same DC (µs–ms)"], ["Disk seek / ocean (ms)"]] },
+  uptime: { rows: [["Availability %"], ["Outage budget this year"]] },
+  napkin: { rows: [["DAU × actions / day"], ["÷ 86,400 → QPS"], ["× peak · bytes · boxes"]] },
+  approach: { rows: [["1. Scope"], ["2. Blueprint + napkin"], ["3. Deep dive"], ["4. Wrap"]] },
 };
 
 export function LessonDiagram({ kind }: { kind: Lesson["diagram"] }) {

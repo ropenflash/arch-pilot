@@ -200,10 +200,19 @@ export function LessonView({ lesson }: { lesson: Lesson }) {
         ) : null}
 
         <div className="mt-8 flex flex-wrap items-center gap-2">
-          {lesson.practiceStepIds?.[0] ? (
+          {lesson.practiceHref || lesson.practiceStepIds?.[0] ? (
             <Button asChild>
-              <Link href={`/learn/from-zero/${lesson.practiceStepIds[0]}`}>
-                Practice this on the board
+              <Link
+                href={
+                  lesson.practiceHref ??
+                  `/learn/from-zero/${lesson.practiceStepIds![0]}`
+                }
+              >
+                {lesson.practiceHref?.startsWith("/learn/estimate")
+                  ? "Try it with live numbers"
+                  : lesson.practiceHref?.startsWith("/learn/approach")
+                    ? "Practice this step"
+                    : "Practice this on the board"}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

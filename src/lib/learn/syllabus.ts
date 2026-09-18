@@ -23,7 +23,24 @@ export type Lesson = {
     choices: LessonChoice[];
   };
   practiceStepIds?: string[];
-  diagram: "single" | "split" | "fleet" | "replica" | "cache" | "cdn" | "stateless" | "regions" | "queue" | "shards" | "ops";
+  practiceHref?: string;
+  diagram:
+    | "single"
+    | "split"
+    | "fleet"
+    | "replica"
+    | "cache"
+    | "cdn"
+    | "stateless"
+    | "regions"
+    | "queue"
+    | "shards"
+    | "ops"
+    | "units"
+    | "latency"
+    | "uptime"
+    | "napkin"
+    | "approach";
 };
 
 export type SyllabusModule = {
@@ -790,6 +807,434 @@ export const SYLLABUS: SyllabusModule[] = [
               label: "Never — diagrams are decorative",
               correct: false,
               feedback: "The board is how you notice a missing failure domain.",
+            },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "napkin",
+    title: "Napkin math",
+    summary:
+      "Size the system before you decorate it: units, what is slow, uptime, QPS, and storage.",
+    lessons: [
+      {
+        slug: "units-and-rounding",
+        title: "Units and rounding",
+        minutes: 6,
+        summary:
+          "Powers of two, labeled units, and why a day can be 10⁵ seconds in your head.",
+        diagram: "units",
+        practiceHref: "/learn/estimate/units",
+        sections: [
+          {
+            heading: "Why the envelope exists",
+            body: "You are not buying hardware in the room. You are checking whether the design is in the right universe: hundreds of QPS or millions, gigabytes a day or petabytes a year. That check is a few multiplications, not a spreadsheet.",
+          },
+          {
+            heading: "Powers of two",
+            body: "A byte is eight bits. 2¹⁰ is about a thousand bytes (a KiB), 2²⁰ a million (MiB), 2³⁰ a billion (GiB). Interviews round 1,024 to 1,000 because the extra 2.4% never changes the architecture. What does change it is forgetting the unit: 5 KB of JSON is not 5 MB of video.",
+          },
+          {
+            heading: "86,400 vs 100,000",
+            body: "A day has 86,400 seconds. Dividing by 100,000 (10⁵) is easier and slightly pessimistic — you underestimate QPS by ~14%. For a 2 million DAU product with 10 requests per person, exact average QPS is about 231; the shortcut says 200. Same order of magnitude. Same number of boxes.",
+          },
+        ],
+        takeaways: [
+          "Label every number with a unit.",
+          "2¹⁰ ≈ a thousand, 2²⁰ ≈ a million, 2³⁰ ≈ a billion.",
+          "Dividing by 10⁵ is legal interview math. Say you are rounding.",
+        ],
+        check: {
+          question: "You divide daily requests by 100,000 instead of 86,400. What happens to average QPS?",
+          choices: [
+            {
+              id: "under",
+              label: "It comes out a bit low — still the right order of magnitude",
+              correct: true,
+              feedback: "Larger divisor, smaller QPS. About 14% low. Fine for napkin math.",
+            },
+            {
+              id: "exact",
+              label: "It becomes exact, because 10⁵ is the definition of a day",
+              correct: false,
+              feedback: "A day is 86,400 seconds. 10⁵ is a convenience.",
+            },
+            {
+              id: "10x",
+              label: "It is off by 10×, so you cannot use it",
+              correct: false,
+              feedback: "14% is not 10×. Order of magnitude is what you wanted.",
+            },
+          ],
+        },
+      },
+      {
+        slug: "latency-orders",
+        title: "What is actually slow",
+        minutes: 6,
+        summary:
+          "RAM vs disk vs another continent — and why compression often beats a fatter pipe.",
+        diagram: "latency",
+        practiceHref: "/learn/estimate/latency",
+        sections: [
+          {
+            heading: "A ladder, not a table to memorize",
+            body: "Think in jumps of a thousand. A CPU cache hit is about a nanosecond. RAM is about a hundred. An SSD random read is ~100 µs. A disk seek is milliseconds. A packet across an ocean is ~150 ms — a loading spinner, not a rounding error.",
+          },
+          {
+            heading: "If 1 ns were 1 second",
+            body: "RAM is a couple of minutes. An SSD hiccup is about a day. A spinning-disk seek is months. California to Europe is years. That is why you keep hot data in memory, why N+1 queries hurt, and why a second region is a product decision, not extra Ethernet.",
+          },
+          {
+            heading: "Cheap tricks that are actually cheap",
+            body: "Squeezing a kilobyte is microseconds. Sending it across a WAN is milliseconds to hundreds of milliseconds. Compress-then-ship is often the right default. Sequential scans beat random seeks. Ten sequential RPCs in one data center are already a user-visible wait.",
+          },
+        ],
+        takeaways: [
+          "Memory is the fast path. Disk and oceans are the slow path.",
+          "Avoid random seeks and chatty per-row RPCs.",
+          "Compression is usually cheaper than extra WAN bytes.",
+        ],
+        check: {
+          question: "A profile payload is 80 KB uncompressed. You can squeeze it in ~2 µs. Should you, before a transatlantic send?",
+          choices: [
+            {
+              id: "yes",
+              label: "Usually yes — the squeeze is cheap compared with ~150 ms on the wire",
+              correct: true,
+              feedback: "CPU microseconds vs WAN milliseconds. Compress unless the payload is already tiny or pre-compressed.",
+            },
+            {
+              id: "never",
+              label: "Never — compression is always slower than the network",
+              correct: false,
+              feedback: "Simple compression is typically microseconds. The ocean is not.",
+            },
+            {
+              id: "disk",
+              label: "Only if you also write the compressed copy to spinning disk first",
+              correct: false,
+              feedback: "Do not add a seek to save a WAN hop. That is backwards.",
+            },
+          ],
+        },
+      },
+      {
+        slug: "nines-of-uptime",
+        title: "Nines of uptime",
+        minutes: 5,
+        summary:
+          "Each extra nine is a smaller outage budget — and a harder failover story.",
+        diagram: "uptime",
+        practiceHref: "/learn/estimate/uptime",
+        sections: [
+          {
+            heading: "What a nine costs",
+            body: "99% uptime allows about fifteen minutes of downtime every day. That is a coffee break, for the whole product, every day. 99.9% is under nine hours a year. 99.99% is under an hour a year. Those are arithmetic facts, not marketing.",
+          },
+          {
+            heading: "Architecture, not a slide",
+            body: "Moving from two nines to four nines is replicas, health checks, practiced failover, maybe a second region, and paging that actually fires. Writing “99.99%” on a whiteboard without a failure path is a hope, not a design.",
+          },
+          {
+            heading: "Ask what the product can stand",
+            body: "A private admin tool can live on two nines. Checkout usually cannot. Agree on the number, then see whether the board can actually spend that little downtime.",
+          },
+        ],
+        takeaways: [
+          "Availability % is an outage budget. Do the division.",
+          "Extra nines are extra moving parts, not extra zeros on a slide.",
+          "Match the nines to the product, then design the failover.",
+        ],
+        check: {
+          question: "99.9% uptime over a 365-day year is about how much downtime?",
+          choices: [
+            {
+              id: "hours",
+              label: "On the order of 9 hours",
+              correct: true,
+              feedback: "0.1% of 365 days is 0.365 days ≈ 8.8 hours.",
+            },
+            {
+              id: "minute",
+              label: "About a minute",
+              correct: false,
+              feedback: "A minute per year is closer to five or six nines.",
+            },
+            {
+              id: "weeks",
+              label: "A couple of weeks",
+              correct: false,
+              feedback: "Weeks would be far below 99%.",
+            },
+          ],
+        },
+      },
+      {
+        slug: "napkin-qps",
+        title: "From users to QPS, disks, and pipes",
+        minutes: 8,
+        summary:
+          "DAU × requests ÷ a day of seconds. Then peak, storage, bandwidth, and a sanity-check server count.",
+        diagram: "napkin",
+        practiceHref: "/learn/estimate/lumen",
+        sections: [
+          {
+            heading: "The skeleton",
+            body: "Daily actives = monthly accounts × the fraction who show up today. Daily requests = DAU × (reads + writes) per person. Average QPS = daily requests ÷ 86,400. Peak QPS = average × a busy-hour factor (often 2–5). Write that factor down; you invented it.",
+          },
+          {
+            heading: "Bytes are a different story",
+            body: "Metadata is cheap. Media is not. Split them: captions in a database, photos in object storage. Bytes/day = writes × size × how many writes actually carry a blob. Multiply by retention for the pile on disk. Bandwidth is peak QPS × payload × 8 bits, in Mbps.",
+          },
+          {
+            heading: "Worked pictures (not one product)",
+            body: "A photo grid (Lumen) is read-heavy QPS plus terabytes of originals. Group chat (Pebble) looks calm until you count messages × attachments. A link shortener (TinyPath) is a read/write ratio problem. Ride pings (Hop) are a firehose from the 12% of users actually on a trip. Short video (Clipwell) is a pipe and a CDN, not an API debate. Open the playground and change the knobs.",
+          },
+          {
+            heading: "Servers are a sanity check",
+            body: "Peak QPS ÷ what one process can hold, then add ~20% headroom. That is not a purchase order. It tells you whether you need 4 boxes or 400 before you draw a service mesh.",
+          },
+        ],
+        takeaways: [
+          "Population → daily actions → ÷ 86,400 → × peak.",
+          "Estimate metadata and media separately. Retention turns a daily trickle into a pile.",
+          "A server count is an order-of-magnitude check, not a bill of materials.",
+        ],
+        check: {
+          question: "8 million DAU, 10 reads and 0.2 writes per person, peak 3×. Closest average QPS?",
+          choices: [
+            {
+              id: "950",
+              label: "About 900–1,000 QPS (then ~3,000 at peak)",
+              correct: true,
+              feedback: "8e6 × 10.2 / 86,400 ≈ 944 QPS. Peak ≈ 2,800. The shortcut ÷ 100,000 gives 816.",
+            },
+            {
+              id: "8m",
+              label: "8 million QPS — one per user",
+              correct: false,
+              feedback: "Users are not requests per second. Divide by a day of seconds.",
+            },
+            {
+              id: "10",
+              label: "10 QPS, because each user does 10 reads",
+              correct: false,
+              feedback: "You still have 8 million people. Multiply first, then divide by 86,400.",
+            },
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: "approach",
+    title: "Interview approach",
+    summary:
+      "A four-step hour: scope, blueprint plus napkin math, a deep dive, then wrap.",
+    lessons: [
+      {
+        slug: "scope-the-hour",
+        title: "Scope the problem",
+        minutes: 6,
+        summary:
+          "Do not draw yet. Turn a vague prompt into v1 features, clients, and numbers you both own.",
+        diagram: "approach",
+        practiceHref: "/learn/approach/scope",
+        sections: [
+          {
+            heading: "This is pairing, not trivia",
+            body: "Nobody expects a production clone in 45 minutes. The session tests whether you can take an ambiguous problem, ask useful questions, and steer. Jumping to a stack in the first thirty seconds is a red flag, not a flex. There is no hidden correct diagram.",
+          },
+          {
+            heading: "Ask until the prompt is small",
+            body: "Who is the client? What is in v1 versus later? How many people, and how fast does that grow? Read-heavy or write-heavy? Text or media? Any latency bar? If they will not pick a number, invent one out loud and write it on the board. You will need it for napkin math.",
+          },
+          {
+            heading: "Write the assumptions",
+            body: "When they toss a question back (“what do you think?”), that is not a trick. Pick, label, keep moving. Over-engineering — six caches and a mesh before you know the QPS — is the other famous failure mode. Collaboration and clarifying questions are the signal.",
+          },
+        ],
+        takeaways: [
+          "Slow down. Scope is the whole first act.",
+          "Invent labeled numbers when the prompt will not.",
+          "v1 features + clients + scale beat a premature stack.",
+        ],
+        check: {
+          question: "The prompt is “design a photo product.” First move?",
+          choices: [
+            {
+              id: "ask",
+              label: "Ask what v1 includes, who the clients are, and how big it is",
+              correct: true,
+              feedback: "Boxes come after a shared problem. Questions are the skill.",
+            },
+            {
+              id: "kafka",
+              label: "Draw Kafka, Redis, and a service mesh so you look senior",
+              correct: false,
+              feedback: "That is over-engineering as a personality. You do not know the load yet.",
+            },
+            {
+              id: "code",
+              label: "Start writing the upload handler so you have something concrete",
+              correct: false,
+              feedback: "This is not an implementation interview. You may build the wrong product.",
+            },
+          ],
+        },
+      },
+      {
+        slug: "blueprint-and-buy-in",
+        title: "Sketch a blueprint and get a nod",
+        minutes: 7,
+        summary:
+          "Boxes, a write path, a read path, napkin math, then pause for agreement.",
+        diagram: "approach",
+        practiceHref: "/learn/approach/blueprint",
+        sections: [
+          {
+            heading: "A picture you can argue with",
+            body: "Clients, a public door, app servers, stores. Name the two hottest flows. Posting a photo is not the same as opening the home grid — draw both if they diverge. Talk while you draw so they can yank the wheel.",
+          },
+          {
+            heading: "Size it before you decorate it",
+            body: "This is where napkin math earns its keep. QPS, storage, the busy-hour pipe. If the numbers say one region and a cache, do not invent a global mesh. If they say petabytes of video, the CDN is not optional. Show the work; round on purpose.",
+          },
+          {
+            heading: "APIs and tables — sometimes",
+            body: "On a huge prompt, endpoint lists and schemas are a later zoom. On a smaller prompt (a multiplayer room, a tiny game backend) they can be the design. Ask whether they want that depth now. Get a nod before you spend the next twenty minutes.",
+          },
+        ],
+        takeaways: [
+          "High-level boxes plus the hottest flows.",
+          "Napkin math is part of the blueprint, not homework afterward.",
+          "Pause for buy-in. Pairing only works if they can still steer.",
+        ],
+        check: {
+          question: "You have a box diagram for a photo grid. What belongs in this same step?",
+          choices: [
+            {
+              id: "qps",
+              label: "A rough QPS and storage check, then “does this match what you wanted?”",
+              correct: true,
+              feedback: "Blueprint + scale + buy-in. Deep dives come next on purpose.",
+            },
+            {
+              id: "codec",
+              label: "A custom image codec, so storage is optimal",
+              correct: false,
+              feedback: "That is a rabbit hole. Off-the-shelf formats exist.",
+            },
+            {
+              id: "skip",
+              label: "Skip numbers until after you have designed every service",
+              correct: false,
+              feedback: "The numbers tell you which services deserve to exist.",
+            },
+          ],
+        },
+      },
+      {
+        slug: "deep-dive-choices",
+        title: "Go deep on the risky parts",
+        minutes: 6,
+        summary:
+          "One or two bottlenecks. Skip the research paper. Follow their hints.",
+        diagram: "approach",
+        practiceHref: "/learn/approach/deep-dive",
+        sections: [
+          {
+            heading: "You already agreed where to zoom",
+            body: "By now you share a v1, a picture, and a scale. Ask which piece they care about. Senior sessions often want a bottleneck (latency, a hot key, failover), not a prettier diagram.",
+          },
+          {
+            heading: "Pick work that proves the system",
+            body: "Short links: encoding and the read cache. Chat: delivery and presence. Photo grid: upload plus the home-grid fan-out. That is enough. A ranking thesis, a new codec, or a mesh comparison will eat the clock and prove the wrong skill.",
+          },
+          {
+            heading: "Timebox like an adult",
+            body: "Ten to twenty-five minutes. If they keep pointing at latency, follow latency. If you stall, say so and ask where to go next. Stubbornness reads as a narrow teammate.",
+          },
+        ],
+        takeaways: [
+          "Deep-dive the agreed bottleneck, not your favorite trivia.",
+          "Depth should show scale and failure, not a paper.",
+          "Hints are data. Use them.",
+        ],
+        check: {
+          question: "They liked your photo-grid blueprint. Best deep dive?",
+          choices: [
+            {
+              id: "fanout",
+              label: "Upload path and how a celebrity account blows up the home grid",
+              correct: true,
+              feedback: "Those are the risky flows. They decide whether the design works.",
+            },
+            {
+              id: "ml",
+              label: "A full personalization model and feature store",
+              correct: false,
+              feedback: "You still have not stored a photo. Save ML for a different hour.",
+            },
+            {
+              id: "all",
+              label: "Every box, equally, until time runs out",
+              correct: false,
+              feedback: "Equal shallow depth on everything is how nothing gets tested.",
+            },
+          ],
+        },
+      },
+      {
+        slug: "wrap-the-session",
+        title: "Close the loop",
+        minutes: 5,
+        summary:
+          "Recap, name a failure, say what 10× users breaks, and ask what is still itchy.",
+        diagram: "approach",
+        practiceHref: "/learn/approach/wrap",
+        sections: [
+          {
+            heading: "You are not done until they say so",
+            body: "Leave three to five minutes. Restate v1, the diagram, and the two deep dives in under a minute. People forget the beginning of a long board.",
+          },
+          {
+            heading: "Break it on purpose",
+            body: "A box dies. A region dies. A cache is empty. Who notices, and how? Metrics, logs, a page. Then the next scale curve: if this board holds a million people, what changes at ten million? That question is how you show you did not freeze the design in amber.",
+          },
+          {
+            heading: "Never call it perfect",
+            body: "There is always a next constraint. Offer what you would build with another twenty minutes. Ask what they still want on the board. Packing up after the last box wastes the easiest signal in the hour: you can take feedback.",
+          },
+        ],
+        takeaways: [
+          "Recap. Failures. Next 10×. Ops.",
+          "Do not declare the design finished.",
+          "Ask for the last steering input while the clock still runs.",
+        ],
+        check: {
+          question: "Four minutes left. Worst close?",
+          choices: [
+            {
+              id: "perfect",
+              label: "“That’s the complete design; nothing to add.”",
+              correct: true,
+              feedback: "There is always a next constraint. That sentence wastes the wrap.",
+            },
+            {
+              id: "fail",
+              label: "Name a failure, a metric, and what 10× users would change",
+              correct: false,
+              feedback: "That is the wrap. Do that.",
+            },
+            {
+              id: "ask",
+              label: "Ask what they still want to zoom into",
+              correct: false,
+              feedback: "Good. You are not done until they are.",
             },
           ],
         },

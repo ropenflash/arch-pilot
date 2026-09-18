@@ -26,6 +26,14 @@ describe("scale-up syllabus", () => {
       "sharding",
       "observability",
       "production-checklist",
+      "units-and-rounding",
+      "latency-orders",
+      "nines-of-uptime",
+      "napkin-qps",
+      "scope-the-hour",
+      "blueprint-and-buy-in",
+      "deep-dive-choices",
+      "wrap-the-session",
     ]);
     const blob = JSON.stringify(SYLLABUS);
     expect(blob).not.toMatch(/scale from zero to millions/i);
@@ -47,6 +55,9 @@ describe("scale-up syllabus", () => {
     expect(getLesson("single-server")?.practiceStepIds).toEqual(["one-box"]);
     expect(getLesson("cache-layer")?.practiceStepIds).toEqual(["cache", "cache-miss"]);
     expect(nextLesson("single-server")?.slug).toBe("split-web-db");
-    expect(nextLesson("production-checklist")).toBeUndefined();
+    expect(nextLesson("production-checklist")?.slug).toBe("units-and-rounding");
+    expect(nextLesson("wrap-the-session")).toBeUndefined();
+    expect(getLesson("napkin-qps")?.practiceHref).toBe("/learn/estimate/lumen");
+    expect(getLesson("scope-the-hour")?.practiceHref).toBe("/learn/approach/scope");
   });
 });
