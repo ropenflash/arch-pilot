@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Lightbulb } from "lucide-react";
+import { Lightbulb } from "lucide-react";
+import { LearnPathHeader } from "@/components/learn/learn-chrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,14 +52,8 @@ export function EstimateStudio({ slug }: { slug: string }) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <Link
-        href="/learn"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Syllabus
-      </Link>
-      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+      <LearnPathHeader stageId="size" />
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
         Napkin math
       </p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -481,6 +476,9 @@ function ScenarioCalc({ scenarioId }: { scenarioId: ScenarioId }) {
         <div className="flex flex-wrap gap-3 text-sm">
           <Link href="/learn/approach" className="font-medium text-primary hover:underline">
             Use this in the interview approach →
+          </Link>
+          <Link href="/learn#designs" className="font-medium text-primary hover:underline">
+            Design a system →
           </Link>
           <Link href="/learn/lessons/napkin-qps" className="text-muted-foreground hover:text-foreground">
             Read the lesson

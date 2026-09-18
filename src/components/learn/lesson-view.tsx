@@ -2,17 +2,21 @@
 
 import Link from "next/link";
 import { useMemo, useSyncExternalStore } from "react";
-import { ArrowLeft, ArrowRight, BookOpen, Check } from "lucide-react";
+import { ArrowRight, BookOpen, Check } from "lucide-react";
 import { LessonDiagram } from "@/components/learn/lesson-diagram";
+import { LearnPathHeader, StagePills } from "@/components/learn/learn-chrome";
 import { Button } from "@/components/ui/button";
 import {
-  SYLLABUS,
-  allLessons,
   moduleForLesson,
   nextLesson,
   previousLesson,
   type Lesson,
 } from "@/lib/learn/syllabus";
+import {
+  lessonsForStage,
+  practiceFor,
+  stageForLesson,
+} from "@/lib/learn/course";
 import {
   defaultSyllabusProgress,
   parseSyllabusProgress,
@@ -38,10 +42,13 @@ export function LessonView({ lesson }: { lesson: Lesson }) {
   }, [snapshot]);
 
   const currentModule = moduleForLesson(lesson.slug);
+  const stage = stageForLesson(lesson.slug);
+  const stageLessons = lessonsForStage(stage);
   const prev = previousLesson(lesson.slug);
   const next = nextLesson(lesson.slug);
-  const index = allLessons().findIndex((item) => item.slug === lesson.slug);
-  const total = allLessons().length;
+  const index = stageLessons.findIndex((item) => item.slug === lesson.slug);
+  const total = stageLessons.length;
+  const practice = practiceFor(lesson);
   const done = progress.completed.includes(lesson.slug);
   const picked = progress.answers[lesson.slug];
   const choice = lesson.check?.choices.find((item) => item.id === picked);
@@ -67,60 +74,46 @@ export function LessonView({ lesson }: { lesson: Lesson }) {
   }
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[240px_minmax(0,1fr)]">
+    <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[220px_minmax(0,1fr)]">
       <nav className="lg:sticky lg:top-20 lg:self-start">
-        <Link
-          href="/learn"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Syllabus
-        </Link>
-        <ol className="mt-5 space-y-4">
-          {SYLLABUS.map((item) => (
-            <li key={item.id}>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                {item.title}
-              </p>
-              <ul className="mt-1.5 space-y-1">
-                {item.lessons.map((entry) => {
-                  const active = entry.slug === lesson.slug;
-                  const complete = progress.completed.includes(entry.slug);
-                  return (
-                    <li key={entry.slug}>
-                      <Link
-                        href={`/learn/lessons/${entry.slug}`}
-                        className={cn(
-                          "flex items-center gap-2 rounded-md px-2 py-1 text-sm",
-                          active
-                            ? "bg-primary/10 font-medium text-foreground"
-                            : "text-muted-foreground hover:text-foreground",
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            "flex h-4 w-4 items-center justify-center rounded-full border text-[10px]",
-                            complete
-                              ? "border-primary bg-primary text-primary-foreground"
-                              : "border-border",
-                          )}
-                        >
-                          {complete ? <Check className="h-2.5 w-2.5" /> : null}
-                        </span>
-                        {entry.title}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </li>
-          ))}
+        <LearnPathHeader stageId={stage.id} />
+        <StagePills activeId={stage.id} />
+        <ol className="mt-5 space-y-1">
+          {stageLessons.map((entry) => {
+            const active = entry.slug === lesson.slug;
+            const complete = progress.completed.includes(entry.slug);
+            return (
+              <li key={entry.slug}>
+                <Link
+                  href={`/learn/lessons/${entry.slug}`}
+                  className={cn(
+                    "flex items-center gap-2 rounded-md px-2 py-1 text-sm",
+                    active
+                      ? "bg-primary/10 font-medium text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "flex h-4 w-4 items-center justify-center rounded-full border text-[10px]",
+                      complete
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border",
+                    )}
+                  >
+                    {complete ? <Check className="h-2.5 w-2.5" /> : null}
+                  </span>
+                  {entry.title}
+                </Link>
+              </li>
+            );
+          })}
         </ol>
       </nav>
 
       <article className="min-w-0">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-          {currentModule?.title} · Lesson {index + 1} of {total} · {lesson.minutes} min
+          {currentModule?.title} · {index + 1} of {total} in this stage · {lesson.minutes} min
         </p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">{lesson.title}</h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground">
@@ -200,19 +193,10 @@ export function LessonView({ lesson }: { lesson: Lesson }) {
         ) : null}
 
         <div className="mt-8 flex flex-wrap items-center gap-2">
-          {lesson.practiceHref || lesson.practiceStepIds?.[0] ? (
+          {practice ? (
             <Button asChild>
-              <Link
-                href={
-                  lesson.practiceHref ??
-                  `/learn/from-zero/${lesson.practiceStepIds![0]}`
-                }
-              >
-                {lesson.practiceHref?.startsWith("/learn/estimate")
-                  ? "Try it with live numbers"
-                  : lesson.practiceHref?.startsWith("/learn/approach")
-                    ? "Practice this step"
-                    : "Practice this on the board"}
+              <Link href={practice.href}>
+                {practice.label}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -246,8 +230,8 @@ export function LessonView({ lesson }: { lesson: Lesson }) {
               {next.title} →
             </Link>
           ) : (
-            <Link href="/learn/from-zero" className="font-medium text-primary hover:underline">
-              Draw the full board →
+            <Link href="/learn#designs" className="font-medium text-primary hover:underline">
+              Design a real system →
             </Link>
           )}
         </div>

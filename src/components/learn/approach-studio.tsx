@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, Clock } from "lucide-react";
+import { ArrowRight, Check, Clock } from "lucide-react";
+import { LearnPathHeader } from "@/components/learn/learn-chrome";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -31,14 +32,8 @@ export function ApproachStudio({ stepId }: { stepId: string }) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <Link
-        href="/learn"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Syllabus
-      </Link>
-      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+      <LearnPathHeader stageId="hour" detail={`Step ${step.number} of ${APPROACH_STEPS.length}`} />
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
         Interview approach
       </p>
       <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
@@ -160,29 +155,31 @@ export function ApproachStudio({ stepId }: { stepId: string }) {
         </aside>
       </div>
 
-      <div className="mt-10 grid gap-4 lg:grid-cols-2">
-        <article className="rounded-2xl border border-border bg-card p-5">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">Do</h2>
-          <ul className="mt-3 space-y-2 text-sm leading-6">
-            {APPROACH_DO.map((item) => (
-              <li key={item} className="flex gap-2">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </article>
-        <article className="rounded-2xl border border-border bg-card p-5">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">
-            Don&apos;t
-          </h2>
-          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
-            {APPROACH_DONT.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </article>
-      </div>
+      {step.id === "wrap" ? (
+        <div className="mt-10 grid gap-4 lg:grid-cols-2">
+          <article className="rounded-2xl border border-border bg-card p-5">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">Do</h2>
+            <ul className="mt-3 space-y-2 text-sm leading-6">
+              {APPROACH_DO.map((item) => (
+                <li key={item} className="flex gap-2">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </article>
+          <article className="rounded-2xl border border-border bg-card p-5">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-primary">
+              Don&apos;t
+            </h2>
+            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-muted-foreground">
+              {APPROACH_DONT.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </article>
+        </div>
+      ) : null}
 
       <div className="mt-8 flex justify-between text-sm">
         {prev ? (
@@ -199,8 +196,8 @@ export function ApproachStudio({ stepId }: { stepId: string }) {
             {next.title} →
           </Link>
         ) : (
-          <Link href="/learn/from-zero" className="font-medium text-primary hover:underline">
-            Practice on the board →
+          <Link href="/learn#designs" className="font-medium text-primary hover:underline">
+            Design a real system →
           </Link>
         )}
       </div>

@@ -1,185 +1,289 @@
-import Link from "next/link";
-import {
-  ArrowRight,
-  BookOpen,
-  Calculator,
-  Gamepad2,
-  Lightbulb,
-  Route,
-} from "lucide-react";
-import { FROM_ZERO_CAMPAIGN, FROM_ZERO_STEPS } from "@/lib/learn/campaign";
-import { SYLLABUS, allLessons } from "@/lib/learn/syllabus";
-import { Button } from "@/components/ui/button";
+"use client";
 
-const TRACKS = [
-  {
-    href: "/learn/approach",
-    kicker: "The hour",
-    title: "Interview approach",
-    body: "Four steps: scope the prompt, sketch a blueprint with napkin math, deep-dive the risky piece, then wrap. Practice picking questions — not dumping a stack.",
-    cta: "Run the hour",
-    icon: Route,
-  },
-  {
-    href: "/learn/estimate",
-    kicker: "Napkin math",
-    title: "Back-of-the-envelope",
-    body: "Units, what is slow, nines of uptime, then live QPS and storage on five original products. Guess the number, then show the work.",
-    cta: "Open the playground",
-    icon: Calculator,
-  },
-] as const;
+import Link from "next/link";
+import { useMemo, useSyncExternalStore } from "react";
+import { ArrowRight, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  COURSE_STAGES,
+  continueLesson,
+  firstLessonOfStage,
+  lessonHref,
+  lessonsForStage,
+  modulesForStage,
+  practiceFor,
+} from "@/lib/learn/course";
+import {
+  defaultSyllabusProgress,
+  parseSyllabusProgress,
+  readSyllabusProgressSnapshot,
+  subscribeSyllabusProgress,
+} from "@/lib/learn/syllabus-progress";
+import {
+  defaultProblemProgress,
+  parseProblemProgress,
+  readProblemProgressSnapshot,
+  subscribeProblemProgress,
+} from "@/lib/learn/problem-progress";
+import { PRACTICE_PROBLEMS, problemHref } from "@/lib/learn/problems";
+import { allLessons } from "@/lib/learn/syllabus";
+import { cn } from "@/lib/utils";
 
 export function LearnHub() {
+  const lessonSnap = useSyncExternalStore(
+    subscribeSyllabusProgress,
+    readSyllabusProgressSnapshot,
+    () => "",
+  );
+  const problemSnap = useSyncExternalStore(
+    subscribeProblemProgress,
+    readProblemProgressSnapshot,
+    () => "",
+  );
+  const progress = useMemo(() => {
+    if (!lessonSnap) return defaultSyllabusProgress();
+    try {
+      return parseSyllabusProgress(JSON.parse(lessonSnap));
+    } catch {
+      return defaultSyllabusProgress();
+    }
+  }, [lessonSnap]);
+  const problemsDone = useMemo(() => {
+    if (!problemSnap) return defaultProblemProgress();
+    try {
+      return parseProblemProgress(JSON.parse(problemSnap));
+    } catch {
+      return defaultProblemProgress();
+    }
+  }, [problemSnap]);
+
   const lessons = allLessons();
-  const first = lessons[0];
-  const scaleModules = SYLLABUS.filter((module) => module.id !== "napkin" && module.id !== "approach");
-  const extraModules = SYLLABUS.filter((module) => module.id === "napkin" || module.id === "approach");
+  const doneCount = lessons.filter((lesson) =>
+    progress.completed.includes(lesson.slug),
+  ).length;
+  const nextLesson = continueLesson(progress.completed);
+  const nextProblem = PRACTICE_PROBLEMS.find(
+    (item) => !problemsDone.completed.includes(item.id),
+  );
+  const started = doneCount > 0 || problemsDone.completed.length > 0;
+  const lessonsDone = doneCount >= lessons.length;
+  const continueHref = !lessonsDone
+    ? lessonHref(nextLesson.slug)
+    : nextProblem
+      ? problemHref(nextProblem.id)
+      : "/learn#designs";
+  const continueLabel = !started ? "Start" : lessonsDone && !nextProblem ? "Review" : "Continue";
+  const continueHint = !started
+    ? `${lessons.length} lessons, then ${PRACTICE_PROBLEMS.length} systems to design`
+    : !lessonsDone
+      ? nextLesson.title
+      : nextProblem
+        ? `Design ${nextProblem.title}`
+        : "You have designed every system on the path.";
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-        Structured path
+        System design path
       </p>
       <h1 className="mt-3 text-4xl font-semibold tracking-tight">
-        Scale a product from one box
+        Get better at system design
       </h1>
-      <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
-        A structured program: how to run the hour, how to size the system, then
-        how to grow the architecture. Content is original ArchPilot teaching —
-        not a page-by-page recap of any book.
+      <p className="mt-4 text-base leading-7 text-muted-foreground">
+        One path. Grow a product from a single box, learn to size it, learn to
+        run the hour — then design the systems you will actually be asked:
+        rate limiter, short links, feed, chat, video, files, and the rest.
+        The brief is written. You draw.
       </p>
 
-      <div className="mt-8 grid gap-4 lg:grid-cols-2">
-        {TRACKS.map((track) => (
-          <article
-            key={track.href}
-            className="rounded-2xl border border-border bg-card p-6"
-          >
-            <track.icon className="h-5 w-5 text-primary" />
-            <p className="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-              {track.kicker}
-            </p>
-            <h2 className="mt-1 text-xl font-semibold tracking-tight">{track.title}</h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">{track.body}</p>
-            <Button asChild className="mt-4">
-              <Link href={track.href}>
-                {track.cta}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </article>
-        ))}
-      </div>
-
-      <div className="mt-8 flex flex-wrap gap-3">
-        {first ? (
-          <Button asChild>
-            <Link href={`/learn/lessons/${first.slug}`}>
-              Start the syllabus
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        ) : null}
-        <Button asChild variant="outline">
-          <Link href="/learn/from-zero">Jump to practice</Link>
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <Button asChild>
+          <Link href={continueHref}>
+            {continueLabel}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </Button>
+        <p className="text-sm text-muted-foreground">{continueHint}</p>
       </div>
 
-      <ol className="mt-12 space-y-4">
-        {scaleModules.map((module, moduleIndex) => (
-          <ModuleCard
-            key={module.id}
-            module={module}
-            moduleIndex={moduleIndex}
-          />
-        ))}
-      </ol>
-
-      <h2 className="mt-14 text-2xl font-semibold tracking-tight">Then size it, then run the hour</h2>
-      <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-        After the scale-up path, the next skills are napkin math and a repeatable
-        interview approach. Same ideas as the playgrounds above, as short lessons.
+      <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-muted">
+        <div
+          className="h-full rounded-full bg-primary transition-all"
+          style={{
+            width: `${Math.min(
+              100,
+              ((doneCount + problemsDone.completed.length) /
+                Math.max(lessons.length + PRACTICE_PROBLEMS.length, 1)) *
+                100,
+            )}%`,
+          }}
+        />
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        {doneCount}/{lessons.length} lessons · {problemsDone.completed.length}/
+        {PRACTICE_PROBLEMS.length} systems
       </p>
-      <ol className="mt-6 space-y-4">
-        {extraModules.map((module, moduleIndex) => (
-          <ModuleCard
-            key={module.id}
-            module={module}
-            moduleIndex={scaleModules.length + moduleIndex}
-          />
-        ))}
-      </ol>
 
-      <article className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
-        <div className="flex items-start gap-3">
-          <Gamepad2 className="mt-0.5 h-5 w-5 text-primary" />
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight">
-              {FROM_ZERO_CAMPAIGN.title}
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Same path, on the canvas: start tiny, raise the load, take a hint
-              when you are stuck. {FROM_ZERO_STEPS.length} rounds ·{" "}
-              {FROM_ZERO_CAMPAIGN.estimated}.
-            </p>
-            <Button asChild className="mt-5">
-              <Link href="/learn/from-zero">
-                Open the whiteboard
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-        <p className="mt-6 flex items-start gap-2 text-sm text-muted-foreground">
-          <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-          Lessons teach the idea. Napkin math sizes it. Practice makes you draw
-          it before the next bottleneck shows up.
-        </p>
-      </article>
+      <ol className="mt-12 space-y-12">
+        {COURSE_STAGES.map((stage) =>
+          stage.id === "designs" ? (
+            <ProblemsStage
+              key={stage.id}
+              completed={problemsDone.completed}
+            />
+          ) : (
+            <LessonStage
+              key={stage.id}
+              stage={stage}
+              completed={progress.completed}
+            />
+          ),
+        )}
+      </ol>
     </div>
   );
 }
 
-function ModuleCard({
-  module,
-  moduleIndex,
+function LessonStage({
+  stage,
+  completed,
 }: {
-  module: (typeof SYLLABUS)[number];
-  moduleIndex: number;
+  stage: (typeof COURSE_STAGES)[number];
+  completed: string[];
 }) {
+  const stageLessons = lessonsForStage(stage);
+  const stageDone = stageLessons.filter((lesson) => completed.includes(lesson.slug)).length;
+  const first = firstLessonOfStage(stage);
   return (
-    <li className="rounded-2xl border border-border bg-card p-5 sm:p-6">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-        Module {moduleIndex + 1}
-      </p>
-      <h2 className="mt-1 text-xl font-semibold tracking-tight">{module.title}</h2>
-      <p className="mt-2 text-sm leading-6 text-muted-foreground">{module.summary}</p>
-      <ul className="mt-4 divide-y divide-border rounded-xl border border-border">
-        {module.lessons.map((lesson, lessonIndex) => (
-          <li key={lesson.slug}>
-            <Link
-              href={`/learn/lessons/${lesson.slug}`}
-              className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 hover:bg-accent/60"
-            >
-              <span className="flex items-center gap-3">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                  {moduleIndex + 1}.{lessonIndex + 1}
-                </span>
-                <span>
-                  <span className="block text-sm font-medium">{lesson.title}</span>
-                  <span className="block text-xs text-muted-foreground">
-                    {lesson.minutes} min
-                    {lesson.practiceHref || lesson.practiceStepIds?.length
-                      ? " · then practice"
-                      : ""}
+    <li id={stage.id}>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+            Stage {stage.number} of {COURSE_STAGES.length}
+          </p>
+          <h2 className="mt-1 text-2xl font-semibold tracking-tight">{stage.title}</h2>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {stageDone}/{stageLessons.length}
+        </p>
+      </div>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">{stage.blurb}</p>
+      <p className="mt-1 text-sm font-medium text-foreground">{stage.cue}</p>
+      <div className="mt-5 divide-y divide-border rounded-2xl border border-border bg-card">
+        {modulesForStage(stage).map((module) => (
+          <div key={module.id}>
+            {stage.moduleIds.length > 1 ? (
+              <p className="px-4 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                {module.title}
+              </p>
+            ) : null}
+            <ul>
+              {module.lessons.map((lesson) => {
+                const complete = completed.includes(lesson.slug);
+                const action = practiceFor(lesson);
+                return (
+                  <li key={lesson.slug}>
+                    <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5">
+                      <Link
+                        href={lessonHref(lesson.slug)}
+                        className="flex min-w-0 items-center gap-3 hover:text-foreground"
+                      >
+                        <span
+                          className={cn(
+                            "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border",
+                            complete
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border",
+                          )}
+                        >
+                          {complete ? <Check className="h-3 w-3" /> : null}
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-medium">
+                            {lesson.title}
+                          </span>
+                          <span className="block text-xs text-muted-foreground">
+                            {lesson.minutes} min
+                          </span>
+                        </span>
+                      </Link>
+                      {action ? (
+                        <Link
+                          href={action.href}
+                          className="shrink-0 text-xs font-medium text-primary hover:underline"
+                        >
+                          {action.label}
+                        </Link>
+                      ) : null}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </div>
+      {first ? (
+        <Link
+          href={lessonHref(first.slug)}
+          className="mt-3 inline-block text-sm text-primary hover:underline"
+        >
+          Open stage {stage.number}
+        </Link>
+      ) : null}
+    </li>
+  );
+}
+
+function ProblemsStage({ completed }: { completed: string[] }) {
+  const stage = COURSE_STAGES.find((item) => item.id === "designs")!;
+  return (
+    <li id="designs">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+            Stage {stage.number} of {COURSE_STAGES.length}
+          </p>
+          <h2 className="mt-1 text-2xl font-semibold tracking-tight">{stage.title}</h2>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {completed.length}/{PRACTICE_PROBLEMS.length}
+        </p>
+      </div>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">{stage.blurb}</p>
+      <p className="mt-1 text-sm font-medium text-foreground">{stage.cue}</p>
+      <ul className="mt-5 divide-y divide-border rounded-2xl border border-border bg-card">
+        {PRACTICE_PROBLEMS.map((problem, index) => {
+          const complete = completed.includes(problem.id);
+          return (
+            <li key={problem.id}>
+              <Link
+                href={problemHref(problem.id)}
+                className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 hover:bg-accent/50"
+              >
+                <span className="flex min-w-0 items-center gap-3">
+                  <span
+                    className={cn(
+                      "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold",
+                      complete
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border text-muted-foreground",
+                    )}
+                  >
+                    {complete ? <Check className="h-3 w-3" /> : index + 1}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium">{problem.title}</span>
+                    <span className="block truncate text-xs text-muted-foreground">
+                      {problem.product} · {problem.minutes} min · {problem.deepDive}
+                    </span>
                   </span>
                 </span>
-              </span>
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
-            </Link>
-          </li>
-        ))}
+                <span className="text-xs font-medium text-primary">Design this</span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </li>
   );

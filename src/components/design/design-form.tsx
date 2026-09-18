@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -128,6 +129,13 @@ export function DesignForm({
         <h1 className="text-3xl font-semibold tracking-tight text-foreground">{PRODUCT.primaryCta}</h1>
         <p className="mt-3 max-w-2xl text-[15px] leading-7 text-muted-foreground">
           {PRODUCT.formLead}
+        </p>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+          {PRODUCT.formLearnNote}{" "}
+          <Link href="/learn#designs" className="font-medium text-primary hover:underline">
+            Design a system
+          </Link>
+          .
         </p>
         {template ? (
           <p className="mt-3 text-sm text-muted-foreground">
