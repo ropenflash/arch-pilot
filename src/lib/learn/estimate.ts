@@ -556,9 +556,14 @@ export function fmtBytes(bytes: number) {
 
 export function fmtCount(value: number) {
   const abs = Math.abs(value);
-  if (abs >= 1_000_000_000) return `${fmtNum(value / 1_000_000_000, 2)}B`;
-  if (abs >= 1_000_000) return `${fmtNum(value / 1_000_000, 2)}M`;
-  if (abs >= 10_000) return `${fmtNum(value / 1_000, 1)}K`;
+  const scaled = (n: number, suffix: string) => {
+    const round = Math.abs(n - Math.round(n)) < 1e-9;
+    const digits = round ? 0 : n >= 10 ? 1 : 2;
+    return `${fmtNum(n, digits)}${suffix}`;
+  };
+  if (abs >= 1_000_000_000) return scaled(value / 1_000_000_000, "B");
+  if (abs >= 1_000_000) return scaled(value / 1_000_000, "M");
+  if (abs >= 10_000) return scaled(value / 1_000, "K");
   return fmtNum(value, abs >= 100 ? 0 : abs >= 10 ? 1 : 2);
 }
 

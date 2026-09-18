@@ -7,7 +7,14 @@ import {
   getApproachStep,
   scoreChoices,
 } from "@/lib/learn/approach";
-import { BYTE_UNITS, computeNapkin, ESTIMATE_SCENARIOS, gradeQpsGuess, hopWritesPerUserPerDay } from "@/lib/learn/estimate";
+import {
+  BYTE_UNITS,
+  computeNapkin,
+  ESTIMATE_SCENARIOS,
+  fmtCount,
+  gradeQpsGuess,
+  hopWritesPerUserPerDay,
+} from "@/lib/learn/estimate";
 import { SYLLABUS } from "@/lib/learn/syllabus";
 
 describe("napkin math", () => {
@@ -40,6 +47,7 @@ describe("napkin math", () => {
     expect(gradeQpsGuess(1800, 1000).rank).toBe("order");
     expect(gradeQpsGuess(200, 1000).rank).toBe("far");
     expect(gradeQpsGuess(1, 1000).rank).toBe("miss");
+    expect(fmtCount(10_000_000)).toBe("10M");
   });
 });
 
