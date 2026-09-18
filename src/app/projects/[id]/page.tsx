@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { DesignWorkspace } from "@/components/design/design-workspace";
 import { getProject } from "@/lib/projects/repository";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProjectDetailPage({
   params,
 }: {

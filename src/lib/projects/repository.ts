@@ -14,7 +14,7 @@ function assertDatabase() {
   if (!process.env.DATABASE_URL) {
     throw new HttpError(
       "INTERNAL_ERROR",
-      "Database is not configured. Add DATABASE_URL (Neon Postgres on Vercel).",
+      "Database is not configured. Set DATABASE_URL to your Supabase pooler URL.",
       503,
     );
   }
