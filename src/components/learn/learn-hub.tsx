@@ -26,6 +26,7 @@ import {
   subscribeProblemProgress,
 } from "@/lib/learn/problem-progress";
 import { PRACTICE_PROBLEMS, problemHref } from "@/lib/learn/problems";
+import { rateLimiterLessonHref } from "@/lib/learn/rate-limiter-course";
 import { allLessons } from "@/lib/learn/syllabus";
 import { cn } from "@/lib/utils";
 
@@ -265,7 +266,11 @@ function ProblemsStage({ completed }: { completed: string[] }) {
           return (
             <li key={problem.id}>
               <Link
-                href={problemHref(problem.id)}
+                href={
+                  problem.id === "rate-limiter"
+                    ? rateLimiterLessonHref()
+                    : problemHref(problem.id)
+                }
                 className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 hover:bg-accent/50"
               >
                 <span className="flex min-w-0 items-center gap-3">
@@ -286,7 +291,9 @@ function ProblemsStage({ completed }: { completed: string[] }) {
                     </span>
                   </span>
                 </span>
-                <span className="text-xs font-medium text-primary">Design this</span>
+                <span className="text-xs font-medium text-primary">
+                  {problem.id === "rate-limiter" ? "Learn step by step" : "Design this"}
+                </span>
               </Link>
             </li>
           );

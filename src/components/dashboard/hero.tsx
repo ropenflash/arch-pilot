@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { PRODUCT } from "@/lib/content/product";
 import { PRACTICE_PROBLEMS, problemHref } from "@/lib/learn/problems";
+import { rateLimiterLessonHref } from "@/lib/learn/rate-limiter-course";
 
 const QUESTION_ICONS = {
   why: Sparkles,
@@ -151,7 +152,11 @@ export function ExampleGrid() {
         {PRACTICE_PROBLEMS.map((problem, index) => (
           <Link
             key={problem.id}
-            href={problemHref(problem.id)}
+            href={
+              problem.id === "rate-limiter"
+                ? rateLimiterLessonHref()
+                : problemHref(problem.id)
+            }
             className="group rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-accent/60"
           >
             <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -168,7 +173,7 @@ export function ExampleGrid() {
               {problem.prompt}
             </p>
             <p className="mt-4 inline-flex items-center gap-1 text-xs text-primary group-hover:underline">
-              Design this
+              {problem.id === "rate-limiter" ? "Learn step by step" : "Design this"}
               <ArrowRight className="h-3 w-3" />
             </p>
           </Link>
