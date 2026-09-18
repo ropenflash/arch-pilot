@@ -55,7 +55,7 @@ export const PRODUCT = {
     },
     {
       title: "Diagram",
-      body: "An interactive graph you can pan, inspect, and export. Nodes are generated from the design, not drawn by hand.",
+      body: "An editable canvas: add components, draw connections, inspect each node, auto-layout, and export a PNG. Generated designs are a starting point you can redraw.",
     },
     {
       title: "Data & APIs",
@@ -88,7 +88,7 @@ export const PRODUCT = {
   examplesLead:
     "Start from a known problem. Each brief is written the way you would hand it to a principal architect.",
   formLead:
-    "Describe the system as you would to a principal architect. Optional scale fields make capacity math deterministic. Leave them blank if you want the model to state assumptions instead.",
+    "Describe the system as you would to a principal architect, then generate an architecture — or start on a blank canvas and design the diagram yourself. Optional scale fields make capacity math deterministic.",
   reviewEmpty:
     "No review yet. Review Architecture asks a skeptical principal architect to challenge this design. It does not regenerate the architecture.",
   capacityNote:

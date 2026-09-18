@@ -54,6 +54,11 @@ export const assumptionSchema = z
   })
   .passthrough();
 
+export const componentPositionSchema = z.object({
+  x: z.number().finite(),
+  y: z.number().finite(),
+});
+
 export const componentBaseSchema = z.object({
   id: z.string().min(1).max(120),
   name: z.string().min(1).max(200),
@@ -62,6 +67,7 @@ export const componentBaseSchema = z.object({
   technology: z.string().max(200).optional().default(""),
   scalingStrategy: z.string().max(MAX_STRING).optional().default(""),
   failureBehavior: z.string().max(MAX_STRING).optional().default(""),
+  position: componentPositionSchema.optional(),
 });
 
 function normalizeNodeType(
@@ -164,6 +170,8 @@ export const architectureEdgeSchema = z
     label: z.string().max(80).optional().default(""),
     protocol: z.string().max(80).optional().default(""),
     description: z.string().max(MAX_STRING).optional().default(""),
+    sourceHandle: z.string().max(40).optional(),
+    targetHandle: z.string().max(40).optional(),
   })
   .passthrough();
 

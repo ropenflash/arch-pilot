@@ -56,11 +56,41 @@ function slug(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-export function toReactFlowGraph(design: SystemDesign): {
+export function hasStoredPositions(design: SystemDesign): boolean {
+  return collectComponents(design).some(
+    (component) =>
+      component.position != null &&
+      Number.isFinite(component.position.x) &&
+      Number.isFinite(component.position.y),
+  );
+}
+
+function componentPosition(
+  component: { id: string; position?: { x: number; y: number } },
+  index: number,
+  positions?: Record<string, { x: number; y: number }>,
+): { x: number; y: number } {
+  return (
+    positions?.[component.id] ??
+    component.position ?? {
+      x: (index % 3) * 260,
+      y: Math.floor(index / 3) * 120,
+    }
+  );
+}
+
+export function toReactFlowGraph(
+  design: SystemDesign,
+  options: {
+    layout?: boolean;
+    positions?: Record<string, { x: number; y: number }>;
+  } = {},
+): {
   nodes: ArchitectureFlowNode[];
   edges: Edge[];
   droppedEdges: string[];
 } {
+  const shouldLayout = options.layout ?? true;
   const components = collectComponents(design);
   const idSet = new Set(components.map((component) => component.id));
   const nameToId = new Map(
@@ -70,7 +100,7 @@ export function toReactFlowGraph(design: SystemDesign): {
   const nodes: ArchitectureFlowNode[] = components.map((component, index) => ({
     id: component.id,
     type: "architecture",
-    position: { x: 0, y: index * 100 },
+    position: componentPosition(component, index, options.positions),
     data: {
       label: component.name,
       nodeType: component.type,
@@ -100,10 +130,15 @@ export function toReactFlowGraph(design: SystemDesign): {
       source,
       target,
       label,
+      sourceHandle: edge.sourceHandle,
+      targetHandle: edge.targetHandle,
       data: { protocol: edge.protocol, description: edge.description },
     });
   });
 
+  if (!shouldLayout) {
+    return { nodes, edges, droppedEdges };
+  }
   const layouted = layoutGraph(nodes, edges);
   return { nodes: layouted.nodes, edges: layouted.edges, droppedEdges };
 }
