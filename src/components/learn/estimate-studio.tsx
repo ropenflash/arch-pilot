@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Lightbulb } from "lucide-react";
 import { LearnPathHeader } from "@/components/learn/learn-chrome";
+import {
+  AvailabilityReliabilityLab,
+  LatencyPathLab,
+} from "@/components/learn/reliability-labs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -214,6 +218,7 @@ function LatencyPanel() {
           </li>
         ))}
       </ul>
+      <LatencyPathLab />
     </div>
   );
 }
@@ -271,6 +276,7 @@ function UptimePanel() {
         gap is replicas, failover drills, and multi-region — not a prettier SLA
         slide.
       </p>
+      <AvailabilityReliabilityLab />
     </div>
   );
 }
