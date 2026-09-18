@@ -1,0 +1,6 @@
+.next
+.git
+coverage
+.env
+.env.*
+!.env.example
