@@ -25,6 +25,7 @@ import {
   hasStoredPositions,
   layoutGraph,
   toReactFlowGraph,
+  collectComponents,
   type ArchitectureFlowNode,
 } from "@/lib/architecture/graph";
 import {
@@ -212,10 +213,12 @@ function DiagramInner({
   const addAt = useCallback(
     (type: ArchitectureNodeType, position?: { x: number; y: number }) => {
       if (!editable) return;
-      const fallback = screenToFlowPosition({
-        x: (wrapperRef.current?.clientWidth ?? 480) / 2 + 40,
-        y: (wrapperRef.current?.clientHeight ?? 360) / 2,
-      });
+      const count = collectComponents(designRef.current).length;
+      const origin = screenToFlowPosition({ x: 200, y: 96 });
+      const fallback = {
+        x: origin.x + (count % 3) * 250,
+        y: origin.y + Math.floor(count / 3) * 140,
+      };
       emit(addComponent(designRef.current, type, position ?? fallback));
     },
     [editable, emit, screenToFlowPosition],
@@ -365,6 +368,7 @@ function DiagramInner({
             elementsSelectable
             deleteKeyCode={editable ? ["Backspace", "Delete"] : null}
             connectionMode={ConnectionMode.Loose}
+            colorMode="dark"
             defaultEdgeOptions={{
               type: "smoothstep",
               markerEnd: {

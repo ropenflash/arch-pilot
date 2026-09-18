@@ -101,6 +101,7 @@ export function toReactFlowGraph(
     id: component.id,
     type: "architecture",
     position: componentPosition(component, index, options.positions),
+    style: { width: 220, padding: 0, background: "transparent", border: "none" },
     data: {
       label: component.name,
       nodeType: component.type,

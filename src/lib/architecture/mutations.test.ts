@@ -73,6 +73,14 @@ describe("architecture mutations", () => {
     expect(added?.position).toEqual({ x: 480, y: 240 });
   });
 
+  it("keeps spaces in component names while typing", () => {
+    let design = createBlankDesign("Names", "Allow spaces in component titles.");
+    design = updateComponent(design, "client", { name: "Web " });
+    expect(design.services[0]?.name).toBe("Web ");
+    design = updateComponent(design, "client", { name: "Web client" });
+    expect(design.services[0]?.name).toBe("Web client");
+  });
+
   it("updates edge labels, disconnects, and stores layout positions", () => {
     let design = createBlankDesign("Edges", "Connection editing for the canvas.");
     design = addComponent(design, "service", { x: 200, y: 160 });

@@ -80,12 +80,14 @@ export function ArchitectureNode({ data, selected }: NodeProps<ArchNode>) {
         className="architecture-handle"
       />
       <div className="flex items-start gap-2">
-        <span className="mt-0.5 rounded-md border border-white/10 bg-black/30 p-1 text-zinc-200">
+        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-white/10 bg-black/40 text-zinc-200">
           <Icon className="h-3.5 w-3.5" />
         </span>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-zinc-100">{data.label}</p>
-          <p className="truncate text-[11px] capitalize text-zinc-500">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium leading-5 text-zinc-100">
+            {data.label}
+          </p>
+          <p className="truncate text-[11px] capitalize leading-4 text-zinc-500">
             {data.technology || data.nodeType.replaceAll("_", " ")}
           </p>
         </div>

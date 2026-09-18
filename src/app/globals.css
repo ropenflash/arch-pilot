@@ -97,7 +97,22 @@ body {
   color: #52525b !important;
 }
 
-.react-flow__handle.architecture-handle {
+.react-flow__node-architecture {
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  width: auto;
+  text-align: left;
+  color: inherit;
+  line-height: 1.35;
+  font-family: inherit;
+}
+
+.react-flow.light,
+.react-flow.dark {
+  --xy-background-color: #09090b;
+}
   width: 8px;
   height: 8px;
   background: #71717a;

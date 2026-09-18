@@ -224,7 +224,11 @@ export function updateComponent(
   const nextKind = kindForType(nextType);
   const merged = emptyComponent({
     id,
-    name: patch.name?.trim() || current.name,
+    name: patch.name === undefined
+      ? current.name
+      : patch.name.trim() === ""
+        ? current.name
+        : patch.name,
     type: nextType,
     position: current.position,
   });
