@@ -22,7 +22,6 @@ export function RateLimiterCourse({
   const previous = RATE_LIMITER_SECTIONS[index - 1];
   const next = RATE_LIMITER_SECTIONS[index + 1];
   const [choice, setChoice] = useState<string | null>(null);
-  const selected = section.checkpoint.choices.find((item) => item.id === choice);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
