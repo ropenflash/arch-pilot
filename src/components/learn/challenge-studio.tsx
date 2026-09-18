@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import {
   ArrowLeft,
@@ -48,10 +48,8 @@ function designFor(step: LearnStep, stored: SystemDesign | null) {
   return first ? first.starter() : stored;
 }
 
-export function ChallengeStudio() {
+export function ChallengeStudio({ stepId: routeStepId }: { stepId: string }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const requestedId = searchParams.get("step");
   const snapshot = useSyncExternalStore(
     subscribeLearnProgress,
     readLearnProgressSnapshot,
@@ -68,10 +66,7 @@ export function ChallengeStudio() {
   const [checked, setChecked] = useState(false);
   const [canvasKey, setCanvasKey] = useState(0);
 
-  const stepId =
-    requestedId && stepIndexById(requestedId) >= 0
-      ? requestedId
-      : stored.stepId;
+  const stepId = stepIndexById(routeStepId) >= 0 ? routeStepId : stored.stepId;
   const progress: LearnProgress = useMemo(
     () => ({ ...stored, stepId }),
     [stored, stepId],
@@ -109,7 +104,7 @@ export function ChallengeStudio() {
       stepId: id,
       design: nextDesign === undefined ? progress.design ?? design : nextDesign,
     });
-    router.replace(`/learn/from-zero?step=${id}`, { scroll: false });
+    router.push(`/learn/from-zero/${id}`);
   }
 
   function onDesignChange(next: SystemDesign) {
@@ -148,7 +143,7 @@ export function ChallengeStudio() {
       design: progress.design ?? design,
     });
     if (nextStep) {
-      router.replace(`/learn/from-zero?step=${nextStep.id}`, { scroll: false });
+      router.push(`/learn/from-zero/${nextStep.id}`);
     }
   }
 
@@ -389,7 +384,7 @@ export function ChallengeStudio() {
             onDesignChange={isQuiz(step) ? undefined : onDesignChange}
             readOnly={isQuiz(step)}
             canvasKey={`${step.id}-${canvasKey}`}
-            showInspector={!isQuiz(step)}
+            showInspector={false}
             highlightTypes={isCanvas(step) ? step.highlight : []}
             compact
           />
