@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArchitectureDiagram } from "@/components/diagrams/architecture-diagram";
-import { ArchitectureDetailPanel } from "@/components/architecture/detail-panel";
+import { ArchitectureStudio } from "@/components/architecture/architecture-studio";
 import { ApisPanel } from "@/components/design/apis-panel";
 import { CapacityPanel } from "@/components/design/capacity-panel";
 import { DataModelPanel } from "@/components/design/data-model-panel";
@@ -13,8 +12,10 @@ import { OverviewPanel } from "@/components/design/overview-panel";
 import { ReviewPanel } from "@/components/design/review-panel";
 import { ServicesPanel } from "@/components/design/services-panel";
 import { TechnologyDecisions, TradeoffsPanel } from "@/components/design/tradeoffs-panel";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { collectComponents } from "@/lib/architecture/graph";
 import type {
   ArchitectureReview,
   SystemDesign,
@@ -61,9 +62,17 @@ export function DesignWorkspace({
   const [input, setInput] = useState(initialInput);
   const [design, setDesign] = useState(initialDesign);
   const [review, setReview] = useState(initialReview);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [id, setId] = useState(projectId);
+  const [canvasKey, setCanvasKey] = useState(0);
+  const [dirty, setDirty] = useState(false);
+
+  const components = collectComponents(design);
+
+  function updateDesign(next: SystemDesign) {
+    setDesign(next);
+    setDirty(true);
+  }
 
   async function regenerate() {
     setBusy("regenerate");
@@ -81,6 +90,8 @@ export function DesignWorkspace({
       setInput(data.input);
       setDesign(data.design);
       setReview(null);
+      setCanvasKey((value) => value + 1);
+      setDirty(true);
       toast.success("Architecture regenerated.");
     } finally {
       setBusy(null);
@@ -135,6 +146,7 @@ export function DesignWorkspace({
         return;
       }
       setId(data.project.id);
+      setDirty(false);
       toast.success("Design saved.");
       router.push(`/projects/${data.project.id}`);
     } finally {
@@ -180,12 +192,23 @@ export function DesignWorkspace({
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">System design</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">
+              System design
+            </p>
+            {dirty && !readOnly ? (
+              <Badge variant="outline">Unsaved canvas</Badge>
+            ) : null}
+            {readOnly ? <Badge variant="outline">Read only</Badge> : null}
+          </div>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">{design.title}</h1>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">{design.summary}</p>
+          <p className="mt-3 text-xs text-zinc-500">
+            {components.length} components · {design.architectureEdges.length} connections
+          </p>
         </div>
         {!readOnly ? (
           <div className="flex flex-wrap gap-2">
@@ -236,16 +259,12 @@ export function DesignWorkspace({
           <OverviewPanel design={design} input={input} />
         </TabsContent>
         <TabsContent value="architecture">
-          <div className="flex flex-col gap-4 lg:flex-row">
-            <div className="min-w-0 flex-1">
-              <ArchitectureDiagram design={design} onSelect={setSelectedId} />
-            </div>
-            <ArchitectureDetailPanel
-              design={design}
-              selectedId={selectedId}
-              onClose={() => setSelectedId(null)}
-            />
-          </div>
+          <ArchitectureStudio
+            design={design}
+            onDesignChange={readOnly ? undefined : updateDesign}
+            readOnly={readOnly}
+            canvasKey={canvasKey}
+          />
         </TabsContent>
         <TabsContent value="capacity">
           <CapacityPanel design={design} input={input} />

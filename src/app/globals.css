@@ -96,3 +96,55 @@ body {
   background: transparent !important;
   color: #52525b !important;
 }
+
+.react-flow__node-architecture {
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  width: auto;
+  text-align: left;
+  color: inherit;
+  line-height: 1.35;
+  font-family: inherit;
+}
+
+.react-flow.light,
+.react-flow.dark {
+  --xy-background-color: #09090b;
+}
+
+.react-flow__handle.architecture-handle {
+  width: 8px;
+  height: 8px;
+  background: #71717a;
+  border: 1px solid #d4d4d8;
+  opacity: 0.35;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.react-flow__node:hover .react-flow__handle.architecture-handle,
+.react-flow__node.selected .react-flow__handle.architecture-handle,
+.react-flow__handle.architecture-handle:hover {
+  opacity: 1;
+}
+
+.react-flow__handle.architecture-handle:hover {
+  transform: scale(1.35);
+}
+
+.react-flow__connection-path {
+  stroke: #a1a1aa !important;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #e4e4e7;
+}
+
+.react-flow__edge-textbg {
+  fill: #09090b;
+}
+
+.react-flow__edge-text {
+  fill: #a1a1aa;
+}

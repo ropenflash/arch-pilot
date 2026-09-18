@@ -39,6 +39,12 @@ export function Hero() {
           {PRODUCT.primaryCta}
         </Link>
         <Link
+          href="/design?canvas=1"
+          className="inline-flex h-10 items-center rounded-md border border-border px-5 text-sm text-zinc-300 hover:bg-zinc-900"
+        >
+          Start on a blank canvas
+        </Link>
+        <Link
           href="#examples"
           className="inline-flex h-10 items-center rounded-md border border-border px-5 text-sm text-zinc-300 hover:bg-zinc-900"
         >

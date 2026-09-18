@@ -10,6 +10,7 @@ import { GenerationProgress } from "@/components/design/generation-progress";
 import { getTemplate } from "@/lib/projects/templates";
 import { linesToList } from "@/lib/utils/sanitize";
 import type { SystemDesignInput } from "@/lib/architecture/validation";
+import { createBlankDesign } from "@/lib/architecture/mutations";
 import { PRODUCT } from "@/lib/content/product";
 import { toast } from "sonner";
 
@@ -225,9 +226,38 @@ export function DesignForm({
 
       {pending ? <GenerationProgress /> : null}
 
-      <Button type="submit" size="lg" disabled={pending}>
-        {pending ? "Generating architecture..." : "Generate Architecture"}
-      </Button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <Button type="submit" size="lg" disabled={pending}>
+          {pending ? "Generating architecture..." : "Generate Architecture"}
+        </Button>
+        <Button
+          type="button"
+          size="lg"
+          variant="secondary"
+          disabled={pending}
+          onClick={() => {
+            const title = name.trim() || "Untitled architecture";
+            const design = createBlankDesign(title, description);
+            onGenerated({
+              input: {
+                ...input,
+                name: title,
+                description:
+                  description.trim().length >= 10
+                    ? description.trim()
+                    : design.summary,
+              },
+              design,
+            });
+            router.replace("/design");
+          }}
+        >
+          Start on a blank canvas
+        </Button>
+      </div>
+      <p className="text-xs text-zinc-500">
+        Generate from the brief, or skip the model and draw the architecture yourself.
+      </p>
     </form>
   );
 }

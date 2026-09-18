@@ -55,4 +55,18 @@ describe("architecture graph conversion", () => {
     const graph = toReactFlowGraph(design);
     expect(graph.nodes.every((node) => Number.isFinite(node.position.x))).toBe(true);
   });
+
+  it("keeps stored positions when layout is skipped", () => {
+    const positioned = systemDesignSchema.parse({
+      ...design,
+      services: design.services.map((item) =>
+        item.id === "client"
+          ? { ...item, position: { x: 42, y: 84 } }
+          : item,
+      ),
+    });
+    const graph = toReactFlowGraph(positioned, { layout: false });
+    const client = graph.nodes.find((node) => node.id === "client");
+    expect(client?.position).toEqual({ x: 42, y: 84 });
+  });
 });
