@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { AppShell } from "@/components/layout/app-shell";
 import { ProviderBanner } from "@/components/layout/provider-banner";
 import { Toaster } from "@/components/ui/sonner";
+import { PRODUCT } from "@/lib/content/product";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,9 +17,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ArchPilot — System Design Copilot",
-  description:
-    "Describe what you're building. ArchPilot turns requirements into architecture, capacity estimates, trade-offs and failure scenarios.",
+  title: PRODUCT.documentTitle,
+  description: PRODUCT.description,
+  openGraph: {
+    title: `${PRODUCT.name} — ${PRODUCT.tagline}`,
+    description: PRODUCT.description,
+  },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {

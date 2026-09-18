@@ -2,13 +2,9 @@
 
 import { useEffect, useState } from "react";
 
-const STEPS = [
-  "Understanding requirements...",
-  "Estimating scale...",
-  "Designing architecture...",
-  "Evaluating trade-offs...",
-  "Generating architecture graph...",
-];
+import { PRODUCT } from "@/lib/content/product";
+
+const STEPS = PRODUCT.generationSteps;
 
 export function GenerationProgress() {
   const [index, setIndex] = useState(0);

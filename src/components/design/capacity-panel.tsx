@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { buildCapacityBreakdown } from "@/lib/capacity/calculations";
 import type { SystemDesign, SystemDesignInput } from "@/lib/architecture/validation";
 import { formatNumber } from "@/lib/utils";
+import { PRODUCT } from "@/lib/content/product";
 
 export function CapacityPanel({
   design,
@@ -79,8 +80,7 @@ export function CapacityPanel({
         </ul>
       ) : (
         <p className="text-xs text-muted-foreground">
-          Arithmetic is computed in application code. The model may supply assumptions,
-          not invented RPS math.
+          {PRODUCT.capacityNote}
         </p>
       )}
     </div>

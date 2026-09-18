@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Box, FolderKanban, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PRODUCT } from "@/lib/content/product";
 
 const links = [
   { href: "/", label: "Dashboard" },
@@ -21,7 +22,7 @@ export function Header() {
           <span className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-zinc-900">
             <Box className="h-3.5 w-3.5" />
           </span>
-          ArchPilot
+          {PRODUCT.name}
         </Link>
         <nav className="flex items-center gap-1 text-sm">
           {links.map((link) => {
@@ -48,7 +49,7 @@ export function Header() {
           className="hidden items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground sm:inline-flex"
         >
           <Plus className="h-3.5 w-3.5" />
-          Create System Design
+          {PRODUCT.primaryCta}
         </Link>
       </div>
     </header>
@@ -58,7 +59,7 @@ export function Header() {
 export function Footer() {
   return (
     <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
-      ArchPilot focuses on the decisions that come before the code.
+      {PRODUCT.footer}
     </footer>
   );
 }

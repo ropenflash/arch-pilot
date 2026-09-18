@@ -12,11 +12,13 @@ ArchPilot focuses on the decisions that come before the code.
 
 For every major choice it asks:
 
-- WHY?
-- WHAT ARE THE TRADE-OFFS?
-- WHEN DOES THIS BREAK?
-- HOW DOES IT SCALE?
-- WHAT HAPPENS WHEN IT FAILS?
+- **Why?** Every component has to earn its place. Kafka, Redis, and CDN appear only when this problem needs them.
+- **What are the trade-offs?** Each decision names the benefit, the cost, and when you would reverse it.
+- **When does this break?** Designs include the failure that will actually happen: spikes, partitions, timeouts, dependency outages.
+- **How does it scale?** Hot paths, shard keys, and what stays off the critical path are explicit.
+- **What happens when it fails?** Detection, mitigation, and recovery are part of the architecture.
+
+Capacity arithmetic is computed in TypeScript (`DAU × requests/user/day ÷ 86,400`). The model may state assumptions; it does not invent RPS math.
 
 ## Screenshots
 
@@ -162,7 +164,8 @@ npm run db:seed
 
 | Variable | Purpose |
 | --- | --- |
-| `DATABASE_URL` | PostgreSQL connection string |
+| `DATABASE_URL` | Postgres URL (Supabase transaction pooler in production) |
+| `DIRECT_URL` | Postgres URL for Prisma migrations (Supabase session pooler) |
 | `AI_PROVIDER` | `ollama` (default) or `openai` |
 | `OLLAMA_BASE_URL` | Ollama host |
 | `OLLAMA_MODEL` | Model name (required for Ollama; never hard-coded) |
@@ -174,26 +177,12 @@ npm run db:seed
 
 ## Deploy on Vercel
 
-ArchPilot is a Next.js app. Production needs PostgreSQL (`DATABASE_URL`). Local Ollama is not available on Vercel; set an OpenAI-compatible provider for generation, or use the seeded example designs without a model.
+ArchPilot is a Next.js app. Production uses **Supabase Postgres**. Local Ollama is not available on Vercel; set an OpenAI-compatible provider for generation, or browse the seeded example designs without a model.
 
-1. Import the GitHub repo at [vercel.com/new](https://vercel.com/new).
-2. Add Neon Postgres from the Vercel Marketplace (this injects `DATABASE_URL`).
-3. Set environment variables for Production and Preview:
-
-```env
-AI_PROVIDER="openai"
-OPENAI_API_KEY="..."
-OPENAI_BASE_URL="https://api.openai.com/v1"
-OPENAI_MODEL="gpt-4o-mini"
-```
-
-4. Deploy. The build runs `prisma migrate deploy && next build`.
-5. Seed examples once against production:
-
-```bash
-vercel env pull .env.production.local --environment production --yes
-DATABASE_URL="$(grep '^DATABASE_URL=' .env.production.local | cut -d= -f2- | tr -d '"')" npx prisma db seed
-```
+1. Create a Supabase project and a dedicated `prisma` database role ([Prisma guide](https://supabase.com/docs/guides/database/prisma)).
+2. Set `DATABASE_URL` to the transaction pooler (port `6543`, `pgbouncer=true`) and `DIRECT_URL` to the session pooler (port `5432`).
+3. Deploy. The build runs `prisma migrate deploy` when those URLs are present.
+4. Seed examples once: `npx prisma db seed` with the production `DIRECT_URL`.
 
 If `OPENAI_API_KEY` is set on Vercel, ArchPilot uses the OpenAI-compatible provider even when `AI_PROVIDER=ollama`.
 

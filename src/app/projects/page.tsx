@@ -3,6 +3,8 @@ import { listProjects } from "@/lib/projects/repository";
 import { Button } from "@/components/ui/button";
 import { ProjectActions } from "@/components/dashboard/project-actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProjectsPage() {
   let projects: Awaited<ReturnType<typeof listProjects>> = [];
   let error: string | null = null;
@@ -18,7 +20,8 @@ export default async function ProjectsPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Recent Designs</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Saved architectures, including seeded examples.
+            Saved architectures, including the seeded e-commerce, ride sharing, and
+            video streaming examples.
           </p>
         </div>
         <Button asChild>

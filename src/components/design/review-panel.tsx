@@ -1,13 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ArchitectureReview } from "@/lib/architecture/validation";
+import { PRODUCT } from "@/lib/content/product";
 
 export function ReviewPanel({ review }: { review: ArchitectureReview | null }) {
   if (!review) {
     return (
       <p className="rounded-xl border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
-        No review yet. Use Review Architecture to get a principal-architect critique.
-        This does not regenerate the design.
+        {PRODUCT.reviewEmpty}
       </p>
     );
   }

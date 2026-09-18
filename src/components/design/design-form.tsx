@@ -10,6 +10,7 @@ import { GenerationProgress } from "@/components/design/generation-progress";
 import { getTemplate } from "@/lib/projects/templates";
 import { linesToList } from "@/lib/utils/sanitize";
 import type { SystemDesignInput } from "@/lib/architecture/validation";
+import { PRODUCT } from "@/lib/content/product";
 import { toast } from "sonner";
 
 function optionalNumber(value: string): number | undefined {
@@ -47,6 +48,9 @@ export function DesignForm({
   const [storage, setStorage] = useState(
     template?.input.scale?.expectedStorageGrowthGbPerDay?.toString() ?? "",
   );
+  const [requestsPerUser, setRequestsPerUser] = useState(
+    template?.input.scale?.requestsPerUserPerDay?.toString() ?? "",
+  );
   const [functional, setFunctional] = useState(
     (template?.input.requirements.functional ?? []).join("\n"),
   );
@@ -67,13 +71,25 @@ export function DesignForm({
         readWriteRatio: ratio.trim() || undefined,
         averageRequestSizeBytes: optionalNumber(requestSize),
         expectedStorageGrowthGbPerDay: optionalNumber(storage),
+        requestsPerUserPerDay: optionalNumber(requestsPerUser),
       },
       requirements: {
         functional: linesToList(functional),
         nonFunctional: linesToList(nonFunctional),
       },
     }),
-    [name, description, dau, peak, ratio, requestSize, storage, functional, nonFunctional],
+    [
+      name,
+      description,
+      dau,
+      peak,
+      ratio,
+      requestSize,
+      storage,
+      requestsPerUser,
+      functional,
+      nonFunctional,
+    ],
   );
 
   async function onSubmit(event: React.FormEvent) {
@@ -108,11 +124,19 @@ export function DesignForm({
   return (
     <form onSubmit={onSubmit} className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Create System Design</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{PRODUCT.primaryCta}</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-          Describe the system as you would to a principal architect. Optional scale
-          fields make capacity math deterministic.
+          {PRODUCT.formLead}
         </p>
+        {template ? (
+          <p className="mt-3 text-xs text-zinc-500">
+            Starting from <span className="text-zinc-300">{template.title}</span>
+            {" · "}
+            {template.domain}
+            {" · "}
+            {template.focus}
+          </p>
+        ) : null}
       </div>
 
       <section className="space-y-3">
@@ -132,7 +156,7 @@ export function DesignForm({
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Design an e-commerce platform capable of handling 1 million daily active users."
+          placeholder="Design an e-commerce platform for 1 million daily active users. Shoppers browse and search a catalog, manage a cart, check out with a payment provider, and track orders. Flash sales multiply traffic. Inventory must not oversell. Payment and order creation must be idempotent."
           className="min-h-[180px]"
           required
         />
@@ -159,6 +183,12 @@ export function DesignForm({
             onChange={setStorage}
             placeholder="GB / day"
           />
+          <Field
+            label="Requests per user per day"
+            value={requestsPerUser}
+            onChange={setRequestsPerUser}
+            placeholder="50"
+          />
         </div>
       </section>
 
@@ -169,7 +199,9 @@ export function DesignForm({
             id="functional"
             value={functional}
             onChange={(e) => setFunctional(e.target.value)}
-            placeholder={"User authentication\nProduct search\nCart\nCheckout\nPayments\nOrder tracking"}
+            placeholder={
+              "User authentication\nProduct catalog\nProduct search\nCart\nCheckout\nPayments\nOrder tracking"
+            }
             className="min-h-[160px]"
           />
         </div>

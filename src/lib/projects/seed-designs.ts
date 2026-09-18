@@ -6,7 +6,7 @@ import { applyDeterministicCapacity } from "@/lib/capacity/calculations";
 const ecommerce: SystemDesign = systemDesignSchema.parse({
   title: "Scalable E-commerce Platform",
   summary:
-    "A request-driven commerce platform with a search-optimized catalog, a strongly consistent checkout path, and asynchronous post-order processing. The core money path stays synchronous and transactional; inventory reservation, emails, and search indexing happen off the critical path.",
+    "A request-driven commerce platform with a search-optimized catalog, a strongly consistent checkout path, and asynchronous post-order processing. Browse and search are cacheable and independently scalable. The money path — cart snapshot, order creation, and payment capture — stays synchronous and transactional; inventory reservation, email, and search indexing happen off the critical path.",
   assumptions: [
     {
       name: "Requests per user per day",
@@ -16,7 +16,17 @@ const ecommerce: SystemDesign = systemDesignSchema.parse({
     {
       name: "Peak multiplier",
       value: "5",
-      rationale: "Flash sales and evening traffic.",
+      rationale: "Flash sales and evening traffic, not a flat diurnal curve.",
+    },
+    {
+      name: "Read/write ratio",
+      value: "30:1",
+      rationale: "Catalog and search dominate; checkout is a thin slice of traffic.",
+    },
+    {
+      name: "Average request size",
+      value: "1200 bytes",
+      rationale: "JSON APIs plus modest product payloads; media is on CDN, not these APIs.",
     },
   ],
   requirements: {
@@ -439,10 +449,28 @@ const ecommerce: SystemDesign = systemDesignSchema.parse({
 const rideshare: SystemDesign = systemDesignSchema.parse({
   title: "RideGrid Ride Sharing System",
   summary:
-    "A geo-heavy matching system. Location updates are a high-write stream stored in Redis; trip state and billing stay in PostgreSQL. Matching is a dedicated service so pricing and tracking can fail independently of dispatch.",
+    "A geo-partitioned matching system. Driver location is a high-write stream kept in Redis with short TTL; trip state, quotes, and billing stay in PostgreSQL. Matching is a dedicated service so a pricing or tracking outage cannot stall dispatch. City cells fail independently, and driver assignment uses compare-and-set so a partition cannot double-book a driver.",
   assumptions: [
-    { name: "Requests per user per day", value: "12", rationale: "Open app, request, track, complete." },
-    { name: "Peak multiplier", value: "6", rationale: "Rush hour." },
+    {
+      name: "Requests per user per day",
+      value: "12",
+      rationale: "Open app, request, track, complete — plus a burst of location pings that are counted separately from API RPS.",
+    },
+    {
+      name: "Peak multiplier",
+      value: "6",
+      rationale: "Rush hour is a several-times spike, not a gentle diurnal curve.",
+    },
+    {
+      name: "Read/write ratio",
+      value: "20:1",
+      rationale: "Location writes dominate the data plane; rider request APIs are relatively rare.",
+    },
+    {
+      name: "Location freshness SLO",
+      value: "3 seconds",
+      rationale: "Matching quality collapses if the location store is stale.",
+    },
   ],
   requirements: {
     functional: ["Driver location", "Ride requests", "Matching", "Pricing", "Trip tracking"],
@@ -743,14 +771,44 @@ const rideshare: SystemDesign = systemDesignSchema.parse({
 const streaming: SystemDesign = systemDesignSchema.parse({
   title: "StreamForge Video Platform",
   summary:
-    "An upload/processing pipeline plus a globally cached playback path. Uploads land in object storage, transcoding workers run off a queue, and playback never touches the transcoding cluster. Recommendations are a separate read-time system so they cannot stall video start.",
+    "An upload and processing pipeline plus a globally cached playback path. Masters land in object storage, transcoding workers drain a queue, and playback never touches the encode farm. Catalog and entitlements are a small control plane. Recommendations and homepage personalization are a separate read-time system so they cannot stall video start. DRM is required only for premium titles.",
   assumptions: [
-    { name: "Requests per user per day", value: "30", rationale: "Home, search, playback heartbeats." },
-    { name: "Peak multiplier", value: "4", rationale: "Prime-time viewing." },
+    {
+      name: "Requests per user per day",
+      value: "30",
+      rationale: "Home, search, playback session start, and sampled heartbeats — not media segment fetches.",
+    },
+    {
+      name: "Peak multiplier",
+      value: "4",
+      rationale: "Prime-time viewing concentrated in a few hours.",
+    },
+    {
+      name: "Read/write ratio",
+      value: "1000:1",
+      rationale: "Playback and catalog reads dwarf uploads; bytes ride the CDN, not these APIs.",
+    },
+    {
+      name: "Storage growth",
+      value: "80 TB/day of media",
+      rationale: "New titles and renditions dominate; metadata is negligible by comparison.",
+    },
   ],
   requirements: {
-    functional: ["Upload", "Transcoding", "CDN", "Playback", "Recommendations"],
-    nonFunctional: ["Low startup time", "High availability", "Cost-efficient bandwidth", "Horizontal scalability"],
+    functional: [
+      "Authenticated video upload with resumable multipart transfer",
+      "Multi-bitrate transcoding and packaging",
+      "Adaptive bitrate playback via CDN",
+      "Catalog browse and title metadata",
+      "Personalized recommendations",
+      "Watch history and resume position",
+    ],
+    nonFunctional: [
+      "Global low-latency playback",
+      "High availability for ready titles even when transcoding is down",
+      "Cost-efficient origin egress",
+      "Control plane scales independently from media path",
+    ],
   },
   capacity: { source: "calculated" },
   services: [

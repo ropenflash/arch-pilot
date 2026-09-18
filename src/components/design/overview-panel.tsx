@@ -41,7 +41,7 @@ export function OverviewPanel({
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Functional</CardTitle>
+          <CardTitle>Functional requirements</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-1.5">
           {(design.requirements.functional.length
@@ -54,7 +54,7 @@ export function OverviewPanel({
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Non-functional</CardTitle>
+          <CardTitle>Non-functional requirements</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-1.5">
           {(design.requirements.nonFunctional.length
