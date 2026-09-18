@@ -49,13 +49,13 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
     }
   }, [snapshot]);
 
-  const [design, setDesign] = useState<SystemDesign>(
-    () => progress.designs[problem.id] ?? starterForProblem(problem),
-  );
+  const [starter] = useState<SystemDesign>(() => starterForProblem(problem));
+  const [draft, setDraft] = useState<SystemDesign | null>(null);
   const [checked, setChecked] = useState(false);
   const [hint, setHint] = useState(false);
   const [coachOpen, setCoachOpen] = useState(false);
   const [guideStep, setGuideStep] = useState(0);
+  const design = draft ?? progress.designs[problem.id] ?? starter;
   const grade = evaluateChecks(design, problem.checks);
   const done = progress.completed.includes(problem.id);
 
@@ -352,7 +352,7 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
           <ArchitectureStudio
             design={design}
             onDesignChange={(nextDesign) => {
-              setDesign(nextDesign);
+              setDraft(nextDesign);
               setChecked(false);
               saveProblemProgress({
                 ...progress,
