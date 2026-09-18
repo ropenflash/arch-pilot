@@ -9,7 +9,7 @@ import { PRODUCT } from "@/lib/content/product";
 
 const links = [
   { href: "/", label: "Dashboard" },
-  { href: "/learn", label: "Play" },
+  { href: "/learn", label: "Learn" },
   { href: "/design", label: "New design" },
   { href: "/projects", label: "Projects" },
 ];

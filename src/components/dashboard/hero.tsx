@@ -7,8 +7,8 @@ import {
   Sparkles,
   Timer,
 } from "lucide-react";
-import { DESIGN_TEMPLATES } from "@/lib/projects/templates";
 import { PRODUCT } from "@/lib/content/product";
+import { PRACTICE_PROBLEMS, problemHref } from "@/lib/learn/problems";
 
 const QUESTION_ICONS = {
   why: Sparkles,
@@ -136,38 +136,39 @@ export function Deliverables() {
 export function ExampleGrid() {
   return (
     <section id="examples" className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-      <div className="mb-6 flex items-end justify-between">
+      <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-lg font-medium">{PRODUCT.examplesHeadline}</h2>
-          <p className="mt-1 max-w-xl text-sm text-muted-foreground">
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
             {PRODUCT.examplesLead}
           </p>
         </div>
-        <Link href="/projects" className="text-sm text-muted-foreground hover:text-foreground">
-          Open projects
+        <Link href="/learn#designs" className="shrink-0 text-sm text-primary hover:underline">
+          Full path
         </Link>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {DESIGN_TEMPLATES.map((example) => (
+        {PRACTICE_PROBLEMS.map((problem, index) => (
           <Link
-            key={example.slug}
-            href={`/design?example=${example.slug}`}
+            key={problem.id}
+            href={problemHref(problem.id)}
             className="group rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-accent/60"
           >
             <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
-              <span>{example.domain}</span>
+              <span>{String(index + 1).padStart(2, "0")}</span>
               <span className="text-border">·</span>
-              <span>{example.scaleLabel}</span>
+              <span>{problem.product}</span>
+              <span className="text-border">·</span>
+              <span>4 guided moves</span>
             </div>
             <h3 className="mt-3 text-sm font-medium text-foreground">
-              {example.title}
+              {problem.title}
             </h3>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {example.subtitle}
+            <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
+              {problem.prompt}
             </p>
-            <p className="mt-3 text-xs text-muted-foreground">{example.focus}</p>
             <p className="mt-4 inline-flex items-center gap-1 text-xs text-primary group-hover:underline">
-              Use this brief
+              Design this
               <ArrowRight className="h-3 w-3" />
             </p>
           </Link>

@@ -24,4 +24,10 @@ describe("product content", () => {
     expect(PRODUCT.reviewEmpty.toLowerCase()).toContain("does not regenerate");
     expect(PRODUCT.capacityNote).toContain("86,400");
   });
+
+  it("points learners at written practice systems instead of inventing a brief", () => {
+    expect(PRODUCT.examplesHeadline).toBe("Design these systems");
+    expect(PRODUCT.formLearnNote.toLowerCase()).toContain("prompts are already written");
+    expect(PRODUCT.footer.toLowerCase()).toContain("design the systems");
+  });
 });

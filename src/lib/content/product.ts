@@ -9,8 +9,10 @@ export const PRODUCT = {
     "Describe the system as you would to a principal architect. ArchPilot returns requirements, deterministic capacity math, a component architecture, APIs, a data model, trade-offs, failure scenarios, an interactive diagram, and a skeptical review — the decisions that come before the code.",
   primaryCta: "Create System Design",
   secondaryCta: "View Examples",
-  learnCta: "Play architecture",
+  learnCta: "Learn the path",
   learnKicker: "Guided practice",
+  formLearnNote:
+    "Learning the interview? Skip this form. The prompts are already written — pick a system and design it.",
   whyHeadline: "Why ArchPilot?",
   whyLead:
     "Most AI coding tools generate code. ArchPilot focuses on the decisions that come before the code.",
@@ -86,9 +88,9 @@ export const PRODUCT = {
       body: "Review Architecture asks a skeptical principal architect to attack the design. It does not rewrite it.",
     },
   ],
-  examplesHeadline: "Example system designs",
+  examplesHeadline: "Design these systems",
   examplesLead:
-    "Start from a known problem. Each brief is written the way you would hand it to a principal architect.",
+    "Twelve written interview problems, each with four guided moves, nudges, trade-offs, a reference approach, and a failure drill.",
   formLead:
     "Describe the system as you would to a principal architect, then generate an architecture — or start on a blank canvas and design the diagram yourself. Optional scale fields make capacity math deterministic.",
   reviewEmpty:
@@ -96,7 +98,7 @@ export const PRODUCT = {
   capacityNote:
     "Average RPS = DAU × requests/user/day ÷ 86,400. Peak RPS = average × peak multiplier. Storage and bandwidth use the same TypeScript formulas. The model may supply assumptions; it does not invent the arithmetic.",
   footer:
-    "ArchPilot focuses on the decisions that come before the code. Play a round, then generate a design.",
+    "Grow the system, size it, run the hour, then design the systems you will actually be asked.",
   generationSteps: [
     "Understanding requirements...",
     "Estimating scale...",

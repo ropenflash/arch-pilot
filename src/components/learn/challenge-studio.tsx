@@ -4,14 +4,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import {
-  ArrowLeft,
   ArrowRight,
+  BookOpen,
   Check,
   Lightbulb,
   RotateCcw,
   Trophy,
 } from "lucide-react";
 import { ArchitectureStudio } from "@/components/architecture/architecture-studio";
+import { LearnPathHeader } from "@/components/learn/learn-chrome";
 import { Button } from "@/components/ui/button";
 import {
   FROM_ZERO_STEPS,
@@ -22,6 +23,7 @@ import {
   type LearnStep,
   type QuizStep,
 } from "@/lib/learn/campaign";
+import { lessonForPractice } from "@/lib/learn/syllabus";
 import {
   defaultLearnProgress,
   parseLearnProgress,
@@ -72,6 +74,7 @@ export function ChallengeStudio({ stepId: routeStepId }: { stepId: string }) {
     [stored, stepId],
   );
   const step = getStep(progress.stepId);
+  const relatedLesson = lessonForPractice(step.id);
   const design = useMemo(
     () => designFor(step, progress.design),
     [progress.design, step],
@@ -166,17 +169,21 @@ export function ChallengeStudio({ stepId: routeStepId }: { stepId: string }) {
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <Link
-          href="/learn"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          All rounds
-        </Link>
-        <p className="text-sm font-medium text-muted-foreground">
-          Round {index + 1} of {total}
-        </p>
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+        <LearnPathHeader
+          stageId="grow"
+          detail={`Round ${index + 1} of ${total}`}
+          className="mb-0"
+        />
+        {relatedLesson ? (
+          <Link
+            href={`/learn/lessons/${relatedLesson.slug}`}
+            className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+          >
+            <BookOpen className="h-4 w-4" />
+            Read the lesson
+          </Link>
+        ) : null}
       </div>
 
       <div className="mb-6">
@@ -390,11 +397,11 @@ export function ChallengeStudio({ stepId: routeStepId }: { stepId: string }) {
           />
           {completedAll ? (
             <p className="mt-4 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3 text-sm">
-              Path complete. You can keep editing the board or{" "}
-              <Link href="/design?canvas=1" className="font-medium text-primary">
-                take it into a free canvas
-              </Link>
-              .
+              Stage 1 complete.{" "}
+              <Link href="/learn#designs" className="font-medium text-primary">
+                Design a real system
+              </Link>{" "}
+              from the path — the prompt is already written.
             </p>
           ) : null}
         </div>
