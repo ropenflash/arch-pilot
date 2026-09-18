@@ -113,6 +113,8 @@ body {
 .react-flow.dark {
   --xy-background-color: #09090b;
 }
+
+.react-flow__handle.architecture-handle {
   width: 8px;
   height: 8px;
   background: #71717a;
