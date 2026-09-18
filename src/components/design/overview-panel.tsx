@@ -16,7 +16,7 @@ export function OverviewPanel({
           <CardTitle>Summary</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm leading-7 text-zinc-300">{design.summary}</p>
+          <p className="text-sm leading-7 text-foreground">{design.summary}</p>
         </CardContent>
       </Card>
       <Card>
@@ -29,8 +29,8 @@ export function OverviewPanel({
           ) : (
             design.assumptions.map((item) => (
               <div key={item.name}>
-                <p className="text-xs text-zinc-500">{item.name}</p>
-                <p className="text-sm text-zinc-200">{item.value}</p>
+                <p className="text-xs text-foreground0">{item.name}</p>
+                <p className="text-sm text-foreground">{item.value}</p>
                 {item.rationale ? (
                   <p className="text-xs text-muted-foreground">{item.rationale}</p>
                 ) : null}
@@ -72,7 +72,7 @@ export function OverviewPanel({
           <CardTitle>Scaling strategy</CardTitle>
         </CardHeader>
         <CardContent>
-          <ul className="list-disc space-y-1 pl-4 text-sm text-zinc-300">
+          <ul className="list-disc space-y-1 pl-4 text-sm text-muted-foreground">
             {design.scalingStrategy.map((item) => (
               <li key={item}>{item}</li>
             ))}

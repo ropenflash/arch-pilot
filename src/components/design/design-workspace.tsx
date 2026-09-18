@@ -68,6 +68,9 @@ export function DesignWorkspace({
   const [dirty, setDirty] = useState(false);
 
   const components = collectComponents(design);
+  const connectionLabel =
+    design.architectureEdges.length === 1 ? "connection" : "connections";
+  const componentLabel = components.length === 1 ? "component" : "components";
 
   function updateDesign(next: SystemDesign) {
     setDesign(next);
@@ -192,52 +195,60 @@ export function DesignWorkspace({
   }
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6">
-      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
+    <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6">
+      <div className="mb-8 flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+        <div className="min-w-0 max-w-3xl">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-xs uppercase tracking-[0.18em] text-zinc-500">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               System design
             </p>
             {dirty && !readOnly ? (
-              <Badge variant="outline">Unsaved canvas</Badge>
+              <Badge variant="outline">Unsaved</Badge>
             ) : null}
             {readOnly ? <Badge variant="outline">Read only</Badge> : null}
           </div>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">{design.title}</h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">{design.summary}</p>
-          <p className="mt-3 text-xs text-zinc-500">
-            {components.length} components · {design.architectureEdges.length} connections
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
+            {design.title}
+          </h1>
+          <p className="mt-3 text-[15px] leading-7 text-muted-foreground">{design.summary}</p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            {components.length} {componentLabel}
+            {" · "}
+            {design.architectureEdges.length} {connectionLabel}
           </p>
         </div>
         {!readOnly ? (
-          <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" size="sm" onClick={regenerate} disabled={!!busy}>
-              <RefreshCw className="h-3.5 w-3.5" />
-              Regenerate
-            </Button>
-            <Button variant="secondary" size="sm" onClick={save} disabled={!!busy}>
-              <Save className="h-3.5 w-3.5" />
-              Save
-            </Button>
-            <Button variant="secondary" size="sm" onClick={share} disabled={!!busy}>
-              <Share2 className="h-3.5 w-3.5" />
-              Share Architecture
-            </Button>
-            <Button variant="secondary" size="sm" onClick={exportJson}>
-              <Download className="h-3.5 w-3.5" />
-              Export
-            </Button>
-            {id ? (
-              <Button variant="secondary" size="sm" onClick={duplicate} disabled={!!busy}>
-                <Copy className="h-3.5 w-3.5" />
-                Duplicate
+          <div className="flex flex-col gap-2 sm:items-end">
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" onClick={save} disabled={!!busy}>
+                <Save className="h-3.5 w-3.5" />
+                Save
               </Button>
-            ) : null}
-            <Button size="sm" onClick={runReview} disabled={!!busy}>
-              <Sparkles className="h-3.5 w-3.5" />
-              {busy === "review" ? "Reviewing..." : "Review Architecture"}
-            </Button>
+              <Button size="sm" onClick={runReview} disabled={!!busy}>
+                <Sparkles className="h-3.5 w-3.5" />
+                {busy === "review" ? "Reviewing..." : "Review"}
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="secondary" size="sm" onClick={regenerate} disabled={!!busy}>
+                <RefreshCw className="h-3.5 w-3.5" />
+                Regenerate
+              </Button>
+              <Button variant="secondary" size="sm" onClick={share} disabled={!!busy}>
+                <Share2 className="h-3.5 w-3.5" />
+                Share
+              </Button>
+              <Button variant="secondary" size="sm" onClick={exportJson}>
+                <Download className="h-3.5 w-3.5" />
+                Export
+              </Button>
+              {id ? (
+                <Button variant="secondary" size="sm" onClick={duplicate} disabled={!!busy}>
+                  <Copy className="h-3.5 w-3.5" />
+                  Duplicate
+                </Button>
+              ) : null}
+            </div>
           </div>
         ) : (
           <Button variant="secondary" size="sm" onClick={exportJson}>

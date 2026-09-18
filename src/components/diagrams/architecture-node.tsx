@@ -1,5 +1,6 @@
 "use client";
 
+import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 import {
   Cloud,
   Database,
@@ -15,7 +16,6 @@ import {
   Zap,
 } from "lucide-react";
 import type { ComponentType } from "react";
-import { Handle, Position, type Node, type NodeProps } from "@xyflow/react";
 import type { ArchitectureNodeData } from "@/lib/architecture/graph";
 import type { ArchitectureNodeType } from "@/lib/architecture/validation";
 import { cn } from "@/lib/utils";
@@ -41,30 +41,15 @@ export const NODE_ICONS: Record<
   other: Server,
 };
 
-const TONES: Record<string, string> = {
-  client: "border-zinc-500 bg-zinc-950",
-  cdn: "border-sky-700/80 bg-sky-950/30",
-  load_balancer: "border-indigo-700/80 bg-indigo-950/20",
-  gateway: "border-violet-700/80 bg-violet-950/20",
-  auth: "border-amber-700/80 bg-amber-950/20",
-  service: "border-zinc-500 bg-zinc-900/80",
-  database: "border-emerald-700/80 bg-emerald-950/25",
-  cache: "border-orange-700/80 bg-orange-950/25",
-  queue: "border-fuchsia-800/80 bg-fuchsia-950/20",
-  storage: "border-teal-800/80 bg-teal-950/20",
-  search: "border-cyan-800/80 bg-cyan-950/20",
-  external: "border-slate-500 bg-slate-950/40",
-  other: "border-zinc-600 bg-zinc-950",
-};
-
 export function ArchitectureNode({ data, selected }: NodeProps<ArchNode>) {
   const Icon = NODE_ICONS[data.nodeType] ?? Server;
+  const subtitle = data.technology || data.nodeType.replaceAll("_", " ");
   return (
     <div
       className={cn(
-        "w-[220px] rounded-lg border px-3 py-2.5 shadow-sm",
-        TONES[data.nodeType],
-        selected && "ring-2 ring-zinc-100/80",
+        "arch-node w-[248px] rounded-xl px-3.5 py-3",
+        `arch-node-${data.nodeType}`,
+        selected && "arch-node-selected",
       )}
     >
       <Handle
@@ -79,16 +64,16 @@ export function ArchitectureNode({ data, selected }: NodeProps<ArchNode>) {
         position={Position.Left}
         className="architecture-handle"
       />
-      <div className="flex items-start gap-2">
-        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-white/10 bg-black/40 text-zinc-200">
-          <Icon className="h-3.5 w-3.5" />
+      <div className="flex items-center gap-2.5">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background/60">
+          <Icon className="h-4 w-4" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium leading-5 text-zinc-100">
+          <p className="truncate text-[15px] font-semibold leading-5">
             {data.label}
           </p>
-          <p className="truncate text-[11px] capitalize leading-4 text-zinc-500">
-            {data.technology || data.nodeType.replaceAll("_", " ")}
+          <p className="mt-0.5 truncate text-xs capitalize leading-4 opacity-80">
+            {subtitle}
           </p>
         </div>
       </div>

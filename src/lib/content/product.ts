@@ -9,6 +9,8 @@ export const PRODUCT = {
     "Describe the system as you would to a principal architect. ArchPilot returns requirements, deterministic capacity math, a component architecture, APIs, a data model, trade-offs, failure scenarios, an interactive diagram, and a skeptical review — the decisions that come before the code.",
   primaryCta: "Create System Design",
   secondaryCta: "View Examples",
+  learnCta: "Play architecture",
+  learnKicker: "Guided practice",
   whyHeadline: "Why ArchPilot?",
   whyLead:
     "Most AI coding tools generate code. ArchPilot focuses on the decisions that come before the code.",
@@ -93,7 +95,8 @@ export const PRODUCT = {
     "No review yet. Review Architecture asks a skeptical principal architect to challenge this design. It does not regenerate the architecture.",
   capacityNote:
     "Average RPS = DAU × requests/user/day ÷ 86,400. Peak RPS = average × peak multiplier. Storage and bandwidth use the same TypeScript formulas. The model may supply assumptions; it does not invent the arithmetic.",
-  footer: "ArchPilot focuses on the decisions that come before the code.",
+  footer:
+    "ArchPilot focuses on the decisions that come before the code. Play a round, then generate a design.",
   generationSteps: [
     "Understanding requirements...",
     "Estimating scale...",
