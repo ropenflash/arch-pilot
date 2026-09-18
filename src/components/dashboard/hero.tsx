@@ -21,34 +21,34 @@ const QUESTION_ICONS = {
 export function Hero() {
   return (
     <section className="mx-auto max-w-4xl px-4 pb-16 pt-20 text-center sm:px-6 sm:pt-28">
-      <p className="mb-4 text-xs font-medium uppercase tracking-[0.22em] text-zinc-500">
+      <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
         {PRODUCT.kicker}
       </p>
-      <h1 className="text-5xl font-semibold tracking-tight text-zinc-50 sm:text-6xl">
+      <h1 className="text-5xl font-semibold tracking-tight text-foreground sm:text-6xl">
         {PRODUCT.name}
       </h1>
-      <p className="mt-5 text-xl text-zinc-300">{PRODUCT.tagline}</p>
-      <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-zinc-400">
+      <p className="mt-5 text-xl text-foreground">{PRODUCT.tagline}</p>
+      <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
         {PRODUCT.longDescription}
       </p>
       <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
         <Link
-          href="/design"
+          href="/learn"
           className="inline-flex h-10 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground"
+        >
+          {PRODUCT.learnCta}
+        </Link>
+        <Link
+          href="/design"
+          className="inline-flex h-10 items-center rounded-md border border-border px-5 text-sm text-foreground hover:bg-accent"
         >
           {PRODUCT.primaryCta}
         </Link>
         <Link
           href="/design?canvas=1"
-          className="inline-flex h-10 items-center rounded-md border border-border px-5 text-sm text-zinc-300 hover:bg-zinc-900"
+          className="inline-flex h-10 items-center rounded-md border border-border px-5 text-sm text-foreground hover:bg-accent"
         >
-          Start on a blank canvas
-        </Link>
-        <Link
-          href="#examples"
-          className="inline-flex h-10 items-center rounded-md border border-border px-5 text-sm text-zinc-300 hover:bg-zinc-900"
-        >
-          {PRODUCT.secondaryCta}
+          Blank canvas
         </Link>
       </div>
     </section>
@@ -59,8 +59,8 @@ export function WhyArchPilot() {
   return (
     <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
-        <h2 className="text-lg font-medium">{PRODUCT.whyHeadline}</h2>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+        <h2 className="text-xl font-semibold text-foreground">{PRODUCT.whyHeadline}</h2>
+        <p className="mt-3 text-[15px] leading-7 text-muted-foreground">
           {PRODUCT.whyLead}
         </p>
       </div>
@@ -70,13 +70,13 @@ export function WhyArchPilot() {
           return (
             <article
               key={question.id}
-              className="rounded-xl border border-border bg-zinc-950/40 p-4 text-left"
+              className="rounded-xl border border-border bg-card p-4 text-left"
             >
-              <Icon className="h-4 w-4 text-zinc-400" />
-              <h3 className="mt-3 text-sm font-medium uppercase tracking-wide text-zinc-100">
+              <Icon className="h-4 w-4 text-primary" />
+              <h3 className="mt-3 text-sm font-semibold uppercase tracking-wide text-foreground">
                 {question.title}
               </h3>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 {question.body}
               </p>
             </article>
@@ -92,8 +92,10 @@ export function Deliverables() {
     <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-lg font-medium">{PRODUCT.outputsHeadline}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h2 className="text-xl font-semibold text-foreground">
+            {PRODUCT.outputsHeadline}
+          </h2>
+          <p className="mt-1 text-[15px] text-muted-foreground">
             One brief in. A design you can argue with, not a chatbot transcript.
           </p>
         </div>
@@ -102,9 +104,9 @@ export function Deliverables() {
         {PRODUCT.outputs.map((item) => (
           <article
             key={item.title}
-            className="rounded-xl border border-border bg-zinc-950/40 p-5"
+            className="rounded-xl border border-border bg-card p-5"
           >
-            <h3 className="text-sm font-medium text-zinc-100">{item.title}</h3>
+            <h3 className="text-base font-semibold text-foreground">{item.title}</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {item.body}
             </p>
@@ -117,10 +119,10 @@ export function Deliverables() {
             key={item.step}
             className="rounded-xl border border-border px-5 py-4"
           >
-            <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
               {item.step}
             </p>
-            <p className="mt-2 text-sm font-medium text-zinc-100">{item.title}</p>
+            <p className="mt-2 text-base font-semibold text-foreground">{item.title}</p>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {item.body}
             </p>
@@ -141,7 +143,7 @@ export function ExampleGrid() {
             {PRODUCT.examplesLead}
           </p>
         </div>
-        <Link href="/projects" className="text-sm text-zinc-400 hover:text-zinc-200">
+        <Link href="/projects" className="text-sm text-muted-foreground hover:text-foreground">
           Open projects
         </Link>
       </div>
@@ -150,21 +152,21 @@ export function ExampleGrid() {
           <Link
             key={example.slug}
             href={`/design?example=${example.slug}`}
-            className="group rounded-xl border border-border bg-zinc-950/40 p-5 transition-colors hover:border-zinc-600 hover:bg-zinc-900/50"
+            className="group rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-accent/60"
           >
-            <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-wider text-zinc-500">
+            <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
               <span>{example.domain}</span>
-              <span className="text-zinc-700">·</span>
+              <span className="text-border">·</span>
               <span>{example.scaleLabel}</span>
             </div>
-            <h3 className="mt-3 text-sm font-medium text-zinc-100">
+            <h3 className="mt-3 text-sm font-medium text-foreground">
               {example.title}
             </h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {example.subtitle}
             </p>
-            <p className="mt-3 text-xs text-zinc-500">{example.focus}</p>
-            <p className="mt-4 inline-flex items-center gap-1 text-xs text-zinc-400 group-hover:text-zinc-200">
+            <p className="mt-3 text-xs text-muted-foreground">{example.focus}</p>
+            <p className="mt-4 inline-flex items-center gap-1 text-xs text-primary group-hover:underline">
               Use this brief
               <ArrowRight className="h-3 w-3" />
             </p>

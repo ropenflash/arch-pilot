@@ -14,12 +14,12 @@ export function ServicesPanel({ design }: { design: SystemDesign }) {
               <CardTitle>{component.name}</CardTitle>
               <Badge variant="outline">{component.type.replaceAll("_", " ")}</Badge>
             </div>
-            <p className="text-xs text-zinc-500">{component.technology}</p>
+            <p className="text-sm text-muted-foreground">{component.technology}</p>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm text-zinc-300">
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
             <p>{component.description}</p>
             <div>
-              <p className="text-[11px] uppercase tracking-wider text-zinc-500">
+              <p className="text-[11px] uppercase tracking-wider text-foreground0">
                 Responsibilities
               </p>
               <ul className="mt-1 list-disc pl-4">
@@ -29,7 +29,7 @@ export function ServicesPanel({ design }: { design: SystemDesign }) {
               </ul>
             </div>
             <p>
-              <span className="text-zinc-500">Scaling · </span>
+              <span className="text-foreground0">Scaling · </span>
               {component.scalingStrategy}
             </p>
           </CardContent>

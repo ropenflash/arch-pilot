@@ -1,26 +1,109 @@
 @import "tailwindcss";
 @import "@xyflow/react/dist/style.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --radius: 0.5rem;
-  --background: #09090b;
-  --foreground: #f4f4f5;
-  --card: #0c0c0e;
-  --card-foreground: #f4f4f5;
-  --popover: #111113;
-  --popover-foreground: #f4f4f5;
-  --primary: #fafafa;
-  --primary-foreground: #09090b;
-  --secondary: #18181b;
-  --secondary-foreground: #e4e4e7;
-  --muted: #18181b;
-  --muted-foreground: #a1a1aa;
-  --accent: #1c1c1f;
-  --accent-foreground: #fafafa;
+  --radius: 0.625rem;
+  --background: #ffffff;
+  --foreground: #1c1917;
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+  --primary: #ea580c;
+  --primary-foreground: #fff7ed;
+  --secondary: #fff7ed;
+  --secondary-foreground: #9a3412;
+  --muted: #f5f5f4;
+  --muted-foreground: #57534e;
+  --accent: #ffedd5;
+  --accent-foreground: #9a3412;
+  --destructive: #dc2626;
+  --border: #e7e5e4;
+  --input: #d6d3d1;
+  --ring: #ea580c;
+  --xy-bg: #fafaf9;
+  --xy-dot: #d6d3d1;
+  --xy-edge: #78716c;
+  --xy-edge-label: #1c1917;
+  --xy-edge-label-bg: #ffffff;
+  --node-fg: #1c1917;
+  --node-client-bg: #ffffff;
+  --node-client-border: #a8a29e;
+  --node-cdn-bg: #f0f9ff;
+  --node-cdn-border: #38bdf8;
+  --node-lb-bg: #fff7ed;
+  --node-lb-border: #ea580c;
+  --node-gateway-bg: #f5f3ff;
+  --node-gateway-border: #8b5cf6;
+  --node-auth-bg: #fffbeb;
+  --node-auth-border: #f59e0b;
+  --node-service-bg: #fff7ed;
+  --node-service-border: #c2410c;
+  --node-database-bg: #ecfdf5;
+  --node-database-border: #10b981;
+  --node-cache-bg: #fff7ed;
+  --node-cache-border: #f97316;
+  --node-queue-bg: #fdf4ff;
+  --node-queue-border: #d946ef;
+  --node-storage-bg: #f0fdfa;
+  --node-storage-border: #14b8a6;
+  --node-search-bg: #ecfeff;
+  --node-search-border: #06b6d4;
+  --node-external-bg: #f8fafc;
+  --node-external-border: #94a3b8;
+}
+
+.dark {
+  --background: #0c0c0e;
+  --foreground: #fafafa;
+  --card: #141416;
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  --primary: #f97316;
+  --primary-foreground: #1c1917;
+  --secondary: #292524;
+  --secondary-foreground: #fed7aa;
+  --muted: #1c1c20;
+  --muted-foreground: #a8a29e;
+  --accent: #2a1c14;
+  --accent-foreground: #fdba74;
   --destructive: #ef4444;
-  --border: #27272a;
-  --input: #27272a;
-  --ring: #3f3f46;
+  --border: #3f3f46;
+  --input: #3f3f46;
+  --ring: #f97316;
+  --xy-bg: #121214;
+  --xy-dot: #3f3f46;
+  --xy-edge: #a8a29e;
+  --xy-edge-label: #fafafa;
+  --xy-edge-label-bg: #121214;
+  --node-fg: #fafafa;
+  --node-client-bg: #27272a;
+  --node-client-border: #a1a1aa;
+  --node-cdn-bg: #082f49;
+  --node-cdn-border: #38bdf8;
+  --node-lb-bg: #431407;
+  --node-lb-border: #fb923c;
+  --node-gateway-bg: #2e1064;
+  --node-gateway-border: #a78bfa;
+  --node-auth-bg: #451a03;
+  --node-auth-border: #fbbf24;
+  --node-service-bg: #292524;
+  --node-service-border: #fdba74;
+  --node-database-bg: #052e16;
+  --node-database-border: #34d399;
+  --node-cache-bg: #431407;
+  --node-cache-border: #fb923c;
+  --node-queue-bg: #4a044e;
+  --node-queue-border: #e879f9;
+  --node-storage-bg: #042f2e;
+  --node-storage-border: #2dd4bf;
+  --node-search-bg: #083344;
+  --node-search-border: #22d3ee;
+  --node-external-bg: #1e293b;
+  --node-external-border: #94a3b8;
 }
 
 @theme inline {
@@ -62,39 +145,40 @@ body {
 
 body {
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: -0.011em;
+  letter-spacing: -0.006em;
+  line-height: 1.5;
 }
 
 .react-flow {
-  --xy-background-color: #09090b;
-  --xy-node-border-default: #27272a;
-  background: #09090b !important;
+  --xy-background-color: var(--xy-bg);
+  --xy-node-border-default: var(--border);
+  background: var(--xy-bg) !important;
 }
 
 .react-flow__minimap {
-  background: #111113 !important;
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
 }
 
 .react-flow__controls {
   box-shadow: none !important;
-  border: 1px solid #27272a;
+  border: 1px solid var(--border);
   overflow: hidden;
   border-radius: 8px;
 }
 
 .react-flow__controls-button {
-  background: #111113 !important;
-  border-bottom: 1px solid #27272a !important;
-  fill: #a1a1aa !important;
-}
-
-.react-flow__edge-text {
-  fill: #a1a1aa;
+  background: var(--card) !important;
+  border-bottom: 1px solid var(--border) !important;
+  fill: var(--foreground) !important;
+  width: 28px !important;
+  height: 28px !important;
 }
 
 .react-flow__attribution {
   background: transparent !important;
-  color: #52525b !important;
+  color: var(--muted-foreground) !important;
 }
 
 .react-flow__node-architecture {
@@ -105,21 +189,21 @@ body {
   width: auto;
   text-align: left;
   color: inherit;
-  line-height: 1.35;
+  line-height: 1.4;
   font-family: inherit;
 }
 
 .react-flow.light,
 .react-flow.dark {
-  --xy-background-color: #09090b;
+  --xy-background-color: var(--xy-bg);
 }
 
 .react-flow__handle.architecture-handle {
-  width: 8px;
-  height: 8px;
-  background: #71717a;
-  border: 1px solid #d4d4d8;
-  opacity: 0.35;
+  width: 10px;
+  height: 10px;
+  background: var(--primary);
+  border: 2px solid var(--card);
+  opacity: 0.55;
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
@@ -130,21 +214,82 @@ body {
 }
 
 .react-flow__handle.architecture-handle:hover {
-  transform: scale(1.35);
+  transform: scale(1.25);
 }
 
 .react-flow__connection-path {
-  stroke: #a1a1aa !important;
+  stroke: var(--primary) !important;
 }
 
 .react-flow__edge.selected .react-flow__edge-path {
-  stroke: #e4e4e7;
+  stroke: var(--primary);
 }
 
 .react-flow__edge-textbg {
-  fill: #09090b;
+  fill: var(--xy-edge-label-bg);
 }
 
 .react-flow__edge-text {
-  fill: #a1a1aa;
+  fill: var(--xy-edge-label);
+  font-size: 12px;
+}
+
+.arch-node {
+  color: var(--node-fg);
+  border-width: 2px;
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.08);
+}
+
+.arch-node-selected {
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--primary);
+}
+
+.arch-node-client {
+  background: var(--node-client-bg);
+  border-color: var(--node-client-border);
+}
+.arch-node-cdn {
+  background: var(--node-cdn-bg);
+  border-color: var(--node-cdn-border);
+}
+.arch-node-load_balancer {
+  background: var(--node-lb-bg);
+  border-color: var(--node-lb-border);
+}
+.arch-node-gateway {
+  background: var(--node-gateway-bg);
+  border-color: var(--node-gateway-border);
+}
+.arch-node-auth {
+  background: var(--node-auth-bg);
+  border-color: var(--node-auth-border);
+}
+.arch-node-service,
+.arch-node-other {
+  background: var(--node-service-bg);
+  border-color: var(--node-service-border);
+}
+.arch-node-database {
+  background: var(--node-database-bg);
+  border-color: var(--node-database-border);
+}
+.arch-node-cache {
+  background: var(--node-cache-bg);
+  border-color: var(--node-cache-border);
+}
+.arch-node-queue {
+  background: var(--node-queue-bg);
+  border-color: var(--node-queue-border);
+}
+.arch-node-storage {
+  background: var(--node-storage-bg);
+  border-color: var(--node-storage-border);
+}
+.arch-node-search {
+  background: var(--node-search-bg);
+  border-color: var(--node-search-border);
+}
+.arch-node-external {
+  background: var(--node-external-bg);
+  border-color: var(--node-external-border);
 }

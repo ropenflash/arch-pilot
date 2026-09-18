@@ -5,7 +5,8 @@ import { ArchitectureDetailPanel } from "@/components/architecture/detail-panel"
 import type { CanvasSelection } from "@/components/architecture/canvas-selection";
 import { ArchitectureDiagram } from "@/components/diagrams/architecture-diagram";
 import { collectComponents } from "@/lib/architecture/graph";
-import type { SystemDesign } from "@/lib/architecture/validation";
+import type { ArchitectureNodeType, SystemDesign } from "@/lib/architecture/validation";
+import { cn } from "@/lib/utils";
 
 function resolveSelection(
   design: SystemDesign,
@@ -29,11 +30,17 @@ export function ArchitectureStudio({
   onDesignChange,
   readOnly = false,
   canvasKey,
+  showInspector = true,
+  highlightTypes,
+  compact = false,
 }: {
   design: SystemDesign;
   onDesignChange?: (design: SystemDesign) => void;
   readOnly?: boolean;
   canvasKey?: string | number;
+  showInspector?: boolean;
+  highlightTypes?: ArchitectureNodeType[];
+  compact?: boolean;
 }) {
   const [selection, setSelection] = useState<CanvasSelection | null>(null);
   const activeSelection = useMemo(
@@ -42,7 +49,7 @@ export function ArchitectureStudio({
   );
 
   return (
-    <div className="flex flex-col gap-4 lg:flex-row">
+    <div className={cn("flex flex-col gap-4", showInspector && "xl:flex-row")}>
       <div className="min-w-0 flex-1">
         <ArchitectureDiagram
           design={design}
@@ -50,15 +57,19 @@ export function ArchitectureStudio({
           onDesignChange={onDesignChange}
           readOnly={readOnly}
           canvasKey={canvasKey}
+          highlightTypes={highlightTypes}
+          compact={compact}
         />
       </div>
-      <ArchitectureDetailPanel
-        design={design}
-        selection={activeSelection}
-        onClose={() => setSelection(null)}
-        onDesignChange={onDesignChange}
-        readOnly={readOnly}
-      />
+      {showInspector ? (
+        <ArchitectureDetailPanel
+          design={design}
+          selection={activeSelection}
+          onClose={() => setSelection(null)}
+          onDesignChange={onDesignChange}
+          readOnly={readOnly}
+        />
+      ) : null}
     </div>
   );
 }

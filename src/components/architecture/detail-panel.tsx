@@ -20,11 +20,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Trash2, Unplug, X } from "lucide-react";
+import { MousePointerClick, Spline, Trash2, Unplug, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
 const selectClass =
-  "flex h-9 w-full rounded-md border border-input bg-zinc-950/40 px-2.5 text-sm outline-none focus-visible:border-zinc-600 focus-visible:ring-1 focus-visible:ring-zinc-600 disabled:opacity-50";
+  "flex h-10 w-full rounded-md border border-input bg-background px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50";
+
+const panelClass =
+  "w-full shrink-0 overflow-y-auto rounded-xl border border-border bg-card p-5 lg:sticky lg:top-20 lg:max-h-[calc(100vh-140px)] lg:w-[380px]";
 
 export function ArchitectureDetailPanel({
   design,
@@ -43,17 +46,38 @@ export function ArchitectureDetailPanel({
 
   if (!selection) {
     return (
-      <aside className="hidden w-[340px] shrink-0 rounded-xl border border-dashed border-border p-5 text-sm text-muted-foreground lg:block">
-        <p className="font-medium text-zinc-300">Inspector</p>
-        <p className="mt-2 leading-6">
-          Select a component to edit name, type, technology, and failure
-          behavior. Select an edge to rename the protocol.
+      <aside className={`${panelClass} text-[15px] leading-6 text-muted-foreground`}>
+        <p className="text-base font-semibold text-foreground">Inspector</p>
+        <p className="mt-2 text-muted-foreground">
+          Click a box on the canvas to edit it. Click a line to rename the
+          connection.
         </p>
-        <ul className="mt-4 list-disc space-y-1.5 pl-4 text-xs leading-5">
-          <li>Drag palette items onto the canvas</li>
-          <li>Pull from a handle to connect two nodes</li>
-          <li>Backspace deletes the selection</li>
-        </ul>
+        <ol className="mt-5 space-y-3 text-sm leading-6 text-foreground">
+          <li className="flex gap-3">
+            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground">
+              1
+            </span>
+            Add a component from the list on the left.
+          </li>
+          <li className="flex gap-3">
+            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground">
+              2
+            </span>
+            <span className="flex items-start gap-2">
+              <MousePointerClick className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+              Click it to name it and say what it does.
+            </span>
+          </li>
+          <li className="flex gap-3">
+            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground">
+              3
+            </span>
+            <span className="flex items-start gap-2">
+              <Spline className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+              Drag from a dot to connect two components.
+            </span>
+          </li>
+        </ol>
       </aside>
     );
   }
@@ -121,14 +145,15 @@ function NodeInspector({
   };
 
   return (
-    <aside className="w-full shrink-0 rounded-xl border border-border bg-zinc-950 p-5 lg:w-[340px]">
-      <div className="mb-4 flex items-start justify-between gap-3">
+    <aside className={panelClass}>
+      <div className="mb-5 flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] uppercase tracking-wider text-zinc-500">Component</p>
-          <h3 className="mt-1 text-base font-medium">{component.name}</h3>
-          <div className="mt-2 flex flex-wrap gap-1">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Component
+          </p>
+          <h3 className="mt-1 text-lg font-semibold text-foreground">{component.name}</h3>
+          <div className="mt-2 flex flex-wrap gap-1.5">
             <Badge>{component.type.replaceAll("_", " ")}</Badge>
-            {component.kind ? <Badge variant="outline">{component.kind}</Badge> : null}
           </div>
         </div>
         <Button size="icon" variant="ghost" onClick={onClose} aria-label="Close inspector">
@@ -137,41 +162,44 @@ function NodeInspector({
       </div>
 
       {editable ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           <Field label="Name">
             <Input
               value={component.name}
               onChange={(event) => patch({ name: event.target.value })}
             />
           </Field>
-          <Field label="Type">
-            <select
-              className={selectClass}
-              value={component.type}
-              onChange={(event) =>
-                patch({ type: event.target.value as ArchitectureNodeType })
-              }
-            >
-              {COMPONENT_PALETTE.map((item) => (
-                <option key={item.type} value={item.type}>
-                  {item.label}
-                </option>
-              ))}
-              <option value="other">Other</option>
-            </select>
-          </Field>
-          <Field label="Technology">
-            <Input
-              value={component.technology ?? ""}
-              onChange={(event) => patch({ technology: event.target.value })}
-              placeholder="Postgres, Redis, Envoy…"
-            />
-          </Field>
-          <Field label="Description">
+          <div className="grid grid-cols-1 gap-4">
+            <Field label="Type">
+              <select
+                className={selectClass}
+                value={component.type}
+                onChange={(event) =>
+                  patch({ type: event.target.value as ArchitectureNodeType })
+                }
+              >
+                {COMPONENT_PALETTE.map((item) => (
+                  <option key={item.type} value={item.type}>
+                    {item.label}
+                  </option>
+                ))}
+                <option value="other">Other</option>
+              </select>
+            </Field>
+            <Field label="Technology">
+              <Input
+                value={component.technology ?? ""}
+                onChange={(event) => patch({ technology: event.target.value })}
+                placeholder="Postgres, Redis, Envoy…"
+              />
+            </Field>
+          </div>
+          <Field label="What it does">
             <Textarea
               className="min-h-[88px]"
               value={component.description}
               onChange={(event) => patch({ description: event.target.value })}
+              placeholder="One or two sentences in plain language."
             />
           </Field>
           <Field label="Responsibilities">
@@ -186,17 +214,17 @@ function NodeInspector({
                     .filter(Boolean),
                 })
               }
-              placeholder="One responsibility per line"
+              placeholder="One item per line"
             />
           </Field>
-          <Field label="Scaling">
+          <Field label="How it scales">
             <Textarea
               className="min-h-[72px]"
               value={component.scalingStrategy ?? ""}
               onChange={(event) => patch({ scalingStrategy: event.target.value })}
             />
           </Field>
-          <Field label="Failure behavior">
+          <Field label="What happens if it fails">
             <Textarea
               className="min-h-[72px]"
               value={component.failureBehavior ?? ""}
@@ -206,7 +234,9 @@ function NodeInspector({
         </div>
       ) : (
         <>
-          <p className="text-sm leading-6 text-zinc-400">{component.description}</p>
+          <p className="text-[15px] leading-7 text-foreground">
+            {component.description || "No description yet."}
+          </p>
           <Section title="Technology">{component.technology || "—"}</Section>
           <Section title="Responsibilities">
             {component.responsibilities.length ? (
@@ -219,19 +249,19 @@ function NodeInspector({
               "—"
             )}
           </Section>
-          <Section title="Scaling">{component.scalingStrategy || "—"}</Section>
-          <Section title="Failure behavior">{component.failureBehavior || "—"}</Section>
+          <Section title="How it scales">{component.scalingStrategy || "—"}</Section>
+          <Section title="If it fails">{component.failureBehavior || "—"}</Section>
         </>
       )}
 
-      <Section title="Dependencies">
+      <Section title="Connected to">
         {[...deps.upstream, ...deps.downstream].length
           ? [...new Set([...deps.upstream, ...deps.downstream])].join(", ")
-          : "None recorded"}
+          : "Nothing yet"}
       </Section>
 
       {editable ? (
-        <div className="mt-5 space-y-3">
+        <div className="mt-5 space-y-3 border-t border-border pt-5">
           <Field label="Connect to">
             <div className="flex gap-2">
               <select
@@ -295,12 +325,16 @@ function EdgeInspector({
   if (!edge) return null;
 
   return (
-    <aside className="w-full shrink-0 rounded-xl border border-border bg-zinc-950 p-5 lg:w-[340px]">
-      <div className="mb-4 flex items-start justify-between gap-3">
+    <aside className={panelClass}>
+      <div className="mb-5 flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] uppercase tracking-wider text-zinc-500">Connection</p>
-          <h3 className="mt-1 text-base font-medium">
-            {names.get(from) ?? from} → {names.get(to) ?? to}
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Connection
+          </p>
+          <h3 className="mt-1 text-lg font-semibold leading-7 text-foreground">
+            {names.get(from) ?? from}
+            <span className="mx-1.5 text-foreground0">→</span>
+            {names.get(to) ?? to}
           </h3>
         </div>
         <Button size="icon" variant="ghost" onClick={onClose} aria-label="Close inspector">
@@ -309,12 +343,13 @@ function EdgeInspector({
       </div>
       {editable ? (
         <>
-          <Field label="Protocol / label">
+          <Field label="Protocol or label">
             <Input
               value={edge.label || edge.protocol || ""}
               onChange={(event) =>
                 onDesignChange?.(updateEdgeLabel(design, from, to, event.target.value))
               }
+              placeholder="HTTP, gRPC, SQL…"
             />
           </Field>
           <Button
@@ -356,10 +391,10 @@ function Field({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mt-5">
-      <h4 className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+      <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         {title}
       </h4>
-      <div className="mt-1.5 text-sm leading-6 text-zinc-300">{children}</div>
+      <div className="mt-1.5 text-[15px] leading-7 text-foreground">{children}</div>
     </div>
   );
 }

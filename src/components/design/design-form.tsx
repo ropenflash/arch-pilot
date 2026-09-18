@@ -125,13 +125,13 @@ export function DesignForm({
   return (
     <form onSubmit={onSubmit} className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{PRODUCT.primaryCta}</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground">{PRODUCT.primaryCta}</h1>
+        <p className="mt-3 max-w-2xl text-[15px] leading-7 text-muted-foreground">
           {PRODUCT.formLead}
         </p>
         {template ? (
-          <p className="mt-3 text-xs text-zinc-500">
-            Starting from <span className="text-zinc-300">{template.title}</span>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Starting from <span className="text-foreground">{template.title}</span>
             {" · "}
             {template.domain}
             {" · "}
@@ -140,7 +140,7 @@ export function DesignForm({
         ) : null}
       </div>
 
-      <section className="space-y-3">
+      <section className="space-y-3 rounded-xl border border-border bg-card p-5">
         <Label htmlFor="name">System name</Label>
         <Input
           id="name"
@@ -151,8 +151,13 @@ export function DesignForm({
         />
       </section>
 
-      <section className="space-y-3">
-        <Label htmlFor="description">Description</Label>
+      <section className="space-y-3 rounded-xl border border-border bg-card p-5">
+        <div>
+          <Label htmlFor="description">Description</Label>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Write it the way you would explain the problem to a principal architect.
+          </p>
+        </div>
         <Textarea
           id="description"
           value={description}
@@ -163,10 +168,10 @@ export function DesignForm({
         />
       </section>
 
-      <section className="space-y-4">
+      <section className="space-y-4 rounded-xl border border-border bg-card p-5">
         <div>
-          <h2 className="text-sm font-medium">Expected scale</h2>
-          <p className="text-xs text-muted-foreground">Optional. Leave blank if unknown.</p>
+          <h2 className="text-base font-semibold text-foreground">Expected scale</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Optional. Leave blank if unknown.</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Daily Active Users" value={dau} onChange={setDau} placeholder="1000000" />
@@ -194,8 +199,9 @@ export function DesignForm({
       </section>
 
       <section className="grid gap-6 sm:grid-cols-2">
-        <div className="space-y-3">
+        <div className="space-y-3 rounded-xl border border-border bg-card p-5">
           <Label htmlFor="functional">Functional requirements</Label>
+          <p className="text-sm text-muted-foreground">One per line.</p>
           <Textarea
             id="functional"
             value={functional}
@@ -206,8 +212,9 @@ export function DesignForm({
             className="min-h-[160px]"
           />
         </div>
-        <div className="space-y-3">
+        <div className="space-y-3 rounded-xl border border-border bg-card p-5">
           <Label htmlFor="nfr">Non-functional requirements</Label>
+          <p className="text-sm text-muted-foreground">Availability, latency, scale…</p>
           <Textarea
             id="nfr"
             value={nonFunctional}
@@ -255,7 +262,7 @@ export function DesignForm({
           Start on a blank canvas
         </Button>
       </div>
-      <p className="text-xs text-zinc-500">
+      <p className="text-sm text-muted-foreground">
         Generate from the brief, or skip the model and draw the architecture yourself.
       </p>
     </form>

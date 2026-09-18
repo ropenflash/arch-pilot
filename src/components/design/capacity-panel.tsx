@@ -16,7 +16,7 @@ export function CapacityPanel({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <h2 className="text-sm font-medium">Capacity estimation</h2>
+        <h2 className="text-base font-semibold text-foreground">Capacity estimation</h2>
         <Badge variant="outline">
           {breakdown.source === "calculated"
             ? "Deterministic"
@@ -91,8 +91,8 @@ function Metric({ label, value }: { label: string; value: string }) {
   return (
     <Card>
       <CardHeader className="p-4">
-        <p className="text-[11px] uppercase tracking-wider text-zinc-500">{label}</p>
-        <p className="text-xl font-medium text-zinc-50">{value}</p>
+        <p className="text-[11px] uppercase tracking-wider text-foreground0">{label}</p>
+        <p className="text-xl font-medium text-foreground">{value}</p>
       </CardHeader>
     </Card>
   );
@@ -101,8 +101,8 @@ function Metric({ label, value }: { label: string; value: string }) {
 function Formula({ k, v }: { k: string; v: string }) {
   return (
     <div className="flex items-center justify-between rounded-md border border-border px-3 py-2">
-      <span className="text-zinc-500">{k}</span>
-      <span className="font-mono text-zinc-200">{v}</span>
+      <span className="text-foreground0">{k}</span>
+      <span className="font-mono text-foreground">{v}</span>
     </div>
   );
 }
