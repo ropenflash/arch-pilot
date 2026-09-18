@@ -49,7 +49,9 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
     }
   }, [snapshot]);
 
-  const [design, setDesign] = useState<SystemDesign>(() => starterForProblem(problem));
+  const [design, setDesign] = useState<SystemDesign>(
+    () => progress.designs[problem.id] ?? starterForProblem(problem),
+  );
   const [checked, setChecked] = useState(false);
   const [hint, setHint] = useState(false);
   const [coachOpen, setCoachOpen] = useState(false);
@@ -59,7 +61,11 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
 
   function markDone() {
     if (done) return;
-    saveProblemProgress({ completed: [...progress.completed, problem.id] });
+    saveProblemProgress({
+      ...progress,
+      completed: [...progress.completed, problem.id],
+      designs: { ...progress.designs, [problem.id]: design },
+    });
   }
 
   return (
@@ -89,6 +95,9 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
           </p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight">{problem.title}</h1>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">{problem.prompt}</p>
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            This board autosaves in this browser.
+          </p>
 
           {problem.id === "rate-limiter" ? (
             <Button asChild variant="secondary" className="mt-4 w-full">
@@ -144,6 +153,7 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
                           setGuideStep(stepIndex);
                           setHint(false);
                         }}
+                        aria-pressed={guideStep === stepIndex}
                         className={cn(
                           "w-full rounded-lg border px-1 py-2 text-center text-xs font-medium",
                           guideStep === stepIndex
@@ -344,6 +354,10 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
             onDesignChange={(nextDesign) => {
               setDesign(nextDesign);
               setChecked(false);
+              saveProblemProgress({
+                ...progress,
+                designs: { ...progress.designs, [problem.id]: nextDesign },
+              });
             }}
             showInspector={false}
             compact

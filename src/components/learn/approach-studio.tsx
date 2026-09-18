@@ -19,6 +19,7 @@ import {
   scoreChoices,
   type ApproachStepId,
 } from "@/lib/learn/approach";
+import { recordExercise } from "@/lib/learn/platform-progress";
 
 const STEP_IDS: ApproachStepId[] = ["scope", "blueprint", "deep-dive", "wrap"];
 
@@ -345,7 +346,14 @@ function QuestionDrill({
           );
         })}
       </ul>
-      <Button type="button" className="mt-3" onClick={() => setChecked(true)}>
+      <Button
+        type="button"
+        className="mt-3"
+        onClick={() => {
+          setChecked(true);
+          recordExercise(`approach-${kind}-${drillId}`);
+        }}
+      >
         Check my picks
       </Button>
       {checked ? (

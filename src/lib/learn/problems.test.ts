@@ -91,6 +91,14 @@ describe("practice systems", () => {
       "chat",
     ]);
     expect(parseProblemProgress(null).completed).toEqual([]);
+    const problem = getProblem("chat")!;
+    const design = starterForProblem(problem);
+    expect(
+      parseProblemProgress({
+        completed: [],
+        designs: { chat: design, broken: { title: "no graph" } },
+      }).designs,
+    ).toEqual({ chat: design });
   });
 });
 

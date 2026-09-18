@@ -98,6 +98,10 @@ export function ProgressDashboard() {
 
   const quizzes = Object.values(data.platform.quizAttempts);
   const quizCorrect = quizzes.filter((item) => item.correct).length;
+  const estimateActivities =
+    Number(data.platform.exercises.some((id) => id.startsWith("estimate-"))) +
+    Number(data.platform.exercises.includes("latency-path")) +
+    Number(data.platform.exercises.includes("availability-calculator"));
   const tracks = [
     {
       id: "foundations",
@@ -111,8 +115,8 @@ export function ProgressDashboard() {
     {
       id: "scalability",
       title: "Scalability",
-      done: data.campaign.completed.length,
-      total: FROM_ZERO_STEPS.length,
+      done: data.campaign.completed.length + estimateActivities,
+      total: FROM_ZERO_STEPS.length + 3,
       href: "/learn/from-zero",
     },
     {
@@ -131,8 +135,9 @@ export function ProgressDashboard() {
       title: "Interview practice",
       done:
         interviewSlugs.filter((slug) => data.syllabus.completed.includes(slug)).length +
-        data.problems.completed.length,
-      total: interviewSlugs.length + PRACTICE_PROBLEMS.length,
+        data.problems.completed.length +
+        Number(data.platform.exercises.some((id) => id.startsWith("approach-"))),
+      total: interviewSlugs.length + PRACTICE_PROBLEMS.length + 1,
       href: "/learn#designs",
     },
   ];
@@ -150,6 +155,7 @@ export function ProgressDashboard() {
     data.syllabus.completed.length +
     data.campaign.completed.length +
     data.problems.completed.length +
+    data.platform.concepts.length +
     data.platform.exercises.length;
 
   return (
@@ -185,6 +191,11 @@ export function ProgressDashboard() {
               </div>
               <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
                 <div
+                  role="progressbar"
+                  aria-label={`${track.title} progress`}
+                  aria-valuemin={0}
+                  aria-valuemax={track.total}
+                  aria-valuenow={track.done}
                   className="h-full rounded-full bg-primary transition-all"
                   style={{ width: `${percent}%` }}
                 />
