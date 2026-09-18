@@ -10,6 +10,7 @@ import {
 import { PRODUCT } from "@/lib/content/product";
 import { PRACTICE_PROBLEMS, problemHref } from "@/lib/learn/problems";
 import { rateLimiterLessonHref } from "@/lib/learn/rate-limiter-course";
+import { MiniArchitecture } from "@/components/dashboard/mini-architecture";
 
 const QUESTION_ICONS = {
   why: Sparkles,
@@ -21,37 +22,111 @@ const QUESTION_ICONS = {
 
 export function Hero() {
   return (
-    <section className="mx-auto max-w-4xl px-4 pb-16 pt-20 text-center sm:px-6 sm:pt-28">
-      <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-        {PRODUCT.kicker}
-      </p>
-      <h1 className="text-5xl font-semibold tracking-tight text-foreground sm:text-6xl">
-        {PRODUCT.name}
-      </h1>
-      <p className="mt-5 text-xl text-foreground">{PRODUCT.tagline}</p>
-      <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-muted-foreground">
-        {PRODUCT.longDescription}
-      </p>
-      <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-        <Link
-          href="/learn"
-          className="inline-flex h-10 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground"
-        >
-          {PRODUCT.learnCta}
-        </Link>
-        <Link
-          href="/design"
-          className="inline-flex h-10 items-center rounded-md border border-border px-5 text-sm text-foreground hover:bg-accent"
-        >
-          {PRODUCT.primaryCta}
-        </Link>
-        <Link
-          href="/design?canvas=1"
-          className="inline-flex h-10 items-center rounded-md border border-border px-5 text-sm text-foreground hover:bg-accent"
-        >
-          Blank canvas
-        </Link>
+    <section className="mx-auto max-w-7xl px-4 pb-20 pt-20 text-center sm:px-6 sm:pt-28">
+      <div className="mx-auto max-w-4xl">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+          {PRODUCT.name} · {PRODUCT.kicker}
+        </p>
+        <h1 className="text-5xl font-semibold uppercase leading-[0.95] tracking-[-0.05em] text-foreground sm:text-7xl">
+          System design,
+          <span className="block text-primary">without the hand-waving.</span>
+        </h1>
+        <p className="mx-auto mt-7 max-w-2xl text-lg leading-8 text-muted-foreground">
+          Learn to design scalable systems by actually designing them. Clarify
+          the problem, estimate the load, make architecture decisions, and
+          explain every trade-off.
+        </p>
+        <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link
+            href="/learn"
+            className="inline-flex h-11 items-center rounded-md bg-primary px-6 text-sm font-semibold text-primary-foreground"
+          >
+            Start learning
+          </Link>
+          <Link
+            href="/design"
+            className="inline-flex h-11 items-center rounded-md border border-border px-6 text-sm font-medium text-foreground hover:bg-accent"
+          >
+            Design a system
+          </Link>
+        </div>
       </div>
+      <MiniArchitecture />
+    </section>
+  );
+}
+
+const JOURNEY = [
+  {
+    step: "01",
+    title: "Understand",
+    body: "Clarify users, scope, traffic shape, and quality constraints.",
+    href: "/learn/mindset",
+  },
+  {
+    step: "02",
+    title: "Estimate",
+    body: "Turn daily users and actions into peak QPS, bytes, and capacity.",
+    href: "/learn/estimate/lumen",
+  },
+  {
+    step: "03",
+    title: "Design",
+    body: "Draw the smallest architecture that satisfies the agreed problem.",
+    href: "/learn/from-zero",
+  },
+  {
+    step: "04",
+    title: "Question",
+    body: "Explain why each component exists and what assumption justifies it.",
+    href: "/learn/concepts",
+  },
+  {
+    step: "05",
+    title: "Simulate",
+    body: "Increase traffic, remove a node, create a hot key, and observe the consequence.",
+    href: "/learn/labs/sharding",
+  },
+  {
+    step: "06",
+    title: "Iterate",
+    body: "Use trade-offs and failure feedback to improve—not replace—the design.",
+    href: "/design",
+  },
+] as const;
+
+export function LearningJourney() {
+  return (
+    <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
+      <div className="max-w-2xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+          Learn by reasoning
+        </p>
+        <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+          Not read → memorize → repeat.
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          ArchPilot teaches the sequence strong engineers actually use.
+        </p>
+      </div>
+      <ol className="mt-6 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+        {JOURNEY.map((item) => (
+          <li key={item.step} className="bg-card">
+            <Link
+              href={item.href}
+              className="group block h-full p-5 transition-colors hover:bg-accent/40"
+            >
+              <p className="font-mono text-xs text-primary">{item.step}</p>
+              <h3 className="mt-3 text-base font-semibold">{item.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.body}</p>
+              <span className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-primary group-hover:underline">
+                Practice this
+                <ArrowRight className="h-3.5 w-3.5" />
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ol>
     </section>
   );
 }

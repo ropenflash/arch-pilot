@@ -2,7 +2,17 @@
 
 import Link from "next/link";
 import { useMemo, useSyncExternalStore } from "react";
-import { ArrowRight, Check } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  Blocks,
+  Brain,
+  Calculator,
+  Check,
+  Network,
+  PencilRuler,
+  Timer,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   COURSE_STAGES,
@@ -29,6 +39,45 @@ import { PRACTICE_PROBLEMS, problemHref } from "@/lib/learn/problems";
 import { rateLimiterLessonHref } from "@/lib/learn/rate-limiter-course";
 import { allLessons } from "@/lib/learn/syllabus";
 import { cn } from "@/lib/utils";
+
+const SKILL_AREAS = [
+  {
+    title: "Think before drawing",
+    detail: "Requirements, scope, assumptions, and trade-offs",
+    href: "/learn/mindset",
+    icon: Brain,
+  },
+  {
+    title: "Estimate the load",
+    detail: "QPS, storage, bandwidth, latency, availability",
+    href: "/learn/estimate/lumen",
+    icon: Calculator,
+  },
+  {
+    title: "Evolve the system",
+    detail: "One box → replicas, cache, queues, shards",
+    href: "/learn/from-zero",
+    icon: Network,
+  },
+  {
+    title: "Understand components",
+    detail: "Problem → building block → trade-off",
+    href: "/learn/concepts/dns",
+    icon: Blocks,
+  },
+  {
+    title: "Run the interview",
+    detail: "Scope, blueprint, deep dive, wrap",
+    href: "/learn/approach/scope",
+    icon: Timer,
+  },
+  {
+    title: "Design real systems",
+    detail: "Written prompts, canvas, coaching, evaluation",
+    href: "/learn#designs",
+    icon: PencilRuler,
+  },
+] as const;
 
 export function LearnHub() {
   const lessonSnap = useSyncExternalStore(
@@ -83,7 +132,7 @@ export function LearnHub() {
         : "You have designed every system on the path.";
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
         System design path
       </p>
@@ -105,10 +154,21 @@ export function LearnHub() {
           </Link>
         </Button>
         <p className="text-sm text-muted-foreground">{continueHint}</p>
+        <Button asChild variant="ghost">
+          <Link href="/learn/progress">
+            <BarChart3 className="h-4 w-4" />
+            My progress
+          </Link>
+        </Button>
       </div>
 
       <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-muted">
         <div
+          role="progressbar"
+          aria-label="Overall learning progress"
+          aria-valuemin={0}
+          aria-valuemax={lessons.length + PRACTICE_PROBLEMS.length}
+          aria-valuenow={doneCount + problemsDone.completed.length}
           className="h-full rounded-full bg-primary transition-all"
           style={{
             width: `${Math.min(
@@ -124,6 +184,36 @@ export function LearnHub() {
         {doneCount}/{lessons.length} lessons · {problemsDone.completed.length}/
         {PRACTICE_PROBLEMS.length} systems
       </p>
+
+      <section className="mt-10">
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+              Learning map
+            </p>
+            <h2 className="mt-1 text-xl font-semibold">Choose the skill that is blocking you</h2>
+          </div>
+          <p className="hidden text-xs text-muted-foreground sm:block">
+            Understand → estimate → design → question → simulate → iterate
+          </p>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {SKILL_AREAS.map((area) => (
+            <Link
+              key={area.title}
+              href={area.href}
+              className="group rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-accent/40"
+            >
+              <area.icon className="h-5 w-5 text-primary" />
+              <h3 className="mt-3 text-sm font-semibold">{area.title}</h3>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">{area.detail}</p>
+              <span className="mt-3 inline-flex text-xs font-medium text-primary group-hover:underline">
+                Open module →
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <ol className="mt-12 space-y-12">
         {COURSE_STAGES.map((stage) =>
@@ -156,7 +246,7 @@ function LessonStage({
   const stageDone = stageLessons.filter((lesson) => completed.includes(lesson.slug)).length;
   const first = firstLessonOfStage(stage);
   return (
-    <li id={stage.id}>
+    <li id={stage.id} className="scroll-mt-24">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
@@ -239,7 +329,7 @@ function LessonStage({
 function ProblemsStage({ completed }: { completed: string[] }) {
   const stage = COURSE_STAGES.find((item) => item.id === "designs")!;
   return (
-    <li id="designs">
+    <li id="designs" className="scroll-mt-24">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">

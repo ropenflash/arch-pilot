@@ -147,6 +147,37 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
     ],
   },
   {
+    id: "pastebin",
+    title: "Text sharing service",
+    minutes: 35,
+    product: "Slate",
+    prompt:
+      "People paste text, receive a short link, and open it later. Public pastes may go viral; private pastes require an unguessable link. Pastes can expire.",
+    v1: [
+      "Create a text paste and receive a link",
+      "Read a paste by id",
+      "Optional expiration and private visibility",
+    ],
+    scale: "5 million new pastes/day, 20:1 reads to writes, up to 1 MB each.",
+    deepDive: "Metadata vs content storage, expiration, and a viral read.",
+    skip: "Collaborative editing and full-text public search in v1.",
+    checks: [
+      twoApps,
+      {
+        id: "store",
+        label: "Durable storage for paste content",
+        pass: (design) =>
+          ofType(design, "database").length + ofType(design, "storage").length >= 1,
+      },
+      {
+        id: "cache-or-cdn",
+        label: "A cache or CDN protects popular reads",
+        pass: (design) =>
+          ofType(design, "cache").length + ofType(design, "cdn").length >= 1,
+      },
+    ],
+  },
+  {
     id: "web-crawler",
     title: "Web crawler",
     minutes: 40,
@@ -278,6 +309,35 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
         label: "A cache or search box on the read path",
         pass: (design) =>
           ofType(design, "cache").length + ofType(design, "search").length >= 1,
+      },
+    ],
+  },
+  {
+    id: "large-scale-search",
+    title: "Large-scale search",
+    minutes: 50,
+    product: "Atlas",
+    prompt:
+      "Search a very large document corpus by text, filters, and relevance. New documents should appear within minutes. Query latency should stay low during indexing.",
+    v1: [
+      "Index documents from a durable source",
+      "Search by terms with filters and ranked results",
+      "Update or delete a document without rebuilding everything",
+    ],
+    scale: "Billions of documents, 80k query QPS at peak, continuous indexing.",
+    deepDive: "Inverted index partitioning, replicas, fan-out, and result merging.",
+    skip: "Inventing a perfect ranking model. Use a simple relevance score and focus on retrieval.",
+    checks: [
+      twoApps,
+      {
+        id: "search",
+        label: "A search index serves queries",
+        pass: (design) => ofType(design, "search").length >= 1,
+      },
+      {
+        id: "queue",
+        label: "Index updates are decoupled through a queue",
+        pass: (design) => ofType(design, "queue").length >= 1,
       },
     ],
   },

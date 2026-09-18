@@ -1,7 +1,7 @@
 import {
-  Deliverables,
   ExampleGrid,
   Hero,
+  LearningJourney,
   WhyArchPilot,
 } from "@/components/dashboard/hero";
 import { RecentDesigns } from "@/components/dashboard/recent-designs";
@@ -12,9 +12,9 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <WhyArchPilot />
-      <Deliverables />
+      <LearningJourney />
       <ExampleGrid />
+      <WhyArchPilot />
       <RecentDesigns />
     </>
   );

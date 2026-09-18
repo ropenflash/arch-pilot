@@ -202,6 +202,42 @@ export const PROBLEM_GUIDES: Record<string, ProblemGuide> = {
     ],
     "A viral code is requested 500k times per second just as its cache entry expires. Explain stampede protection.",
   ),
+  pastebin: guide(
+    "A text-sharing service separates small metadata from variable-size content and makes expiration part of storage lifecycle.",
+    [
+      {
+        title: "Scope the paste",
+        goal: "Define create, read, visibility, size, and expiration.",
+        questions: ["Are edits allowed?", "How large can a paste be?", "Public id or private capability link?"],
+        nudge: "Start with immutable create + read. An edit can create a new version later.",
+      },
+      {
+        title: "Split metadata and bytes",
+        goal: "Choose where ids, owners, expiry, and text content live.",
+        questions: ["Does the text fit comfortably in database rows?", "When would object storage win?", "Who enforces size?"],
+        nudge: "Small text can live in a database; large bodies can move to object storage behind metadata.",
+      },
+      {
+        title: "Serve popular reads",
+        goal: "Keep one viral paste from hammering the source of truth.",
+        questions: ["What is cacheable?", "Can immutable content use a CDN?", "What happens at expiration?"],
+        nudge: "Immutable public pastes are unusually cache-friendly; include expiry in the cache policy.",
+      },
+      {
+        title: "Expire and protect",
+        goal: "Delete safely and prevent guessable private links or abusive payloads.",
+        questions: ["Lazy or scheduled deletion?", "How is a private id generated?", "What gets rate-limited?"],
+        nudge: "Use unguessable capability ids, scan/limit input, and let lifecycle cleanup be asynchronous.",
+      },
+    ],
+    "Create API validates content, mints an unguessable id, stores metadata plus text/blob location, and returns a link. Read API checks cache first and then durable storage; lifecycle workers remove expired content.",
+    [
+      "Database rows simplify small text but make large variable blobs expensive.",
+      "Immutable pastes cache well but edits require versioning or invalidation.",
+      "Capability links are simple sharing but anyone holding the link has access.",
+    ],
+    "A public paste becomes viral while its expiry time arrives. Explain cache behavior, source deletion, and the response after expiry.",
+  ),
   "web-crawler": guide(
     "A crawler is a controlled work pipeline: discover, schedule, fetch, deduplicate, and store.",
     [
@@ -381,6 +417,42 @@ export const PROBLEM_GUIDES: Record<string, ProblemGuide> = {
       "Fuzzy matching improves UX but costs more than exact prefixes.",
     ],
     "A malformed index snapshot crashes half the autocomplete fleet. Explain versioning, health checks, and rollback.",
+  ),
+  "large-scale-search": guide(
+    "Large-scale search is a distributed read model: partition the index, query many partitions, and merge the best candidates.",
+    [
+      {
+        title: "Define the query",
+        goal: "Choose searchable fields, filters, freshness, and a simple relevance promise.",
+        questions: ["Text only or filters too?", "How fresh must updates be?", "How many results are returned?"],
+        nudge: "Keep ranking simple. Retrieval architecture is the first concern.",
+      },
+      {
+        title: "Build the index",
+        goal: "Transform durable documents into an inverted index asynchronously.",
+        questions: ["What emits changes?", "How are deletes represented?", "Can indexing retry safely?"],
+        nudge: "Source DB/store → change stream or queue → indexing workers → search partitions.",
+      },
+      {
+        title: "Partition and query",
+        goal: "Fan a query to index shards and merge top candidates.",
+        questions: ["Partition by document or term?", "How many shards does one query touch?", "Where are top-k results merged?"],
+        nudge: "Document partitioning makes indexing straightforward but queries fan out; replicas add query capacity.",
+      },
+      {
+        title: "Operate freshness",
+        goal: "Handle shard loss, indexing lag, and safe index rebuilds.",
+        questions: ["Can a replica serve a missing shard?", "How is lag measured?", "How do versions switch?"],
+        nudge: "Build versioned indexes, warm them, then atomically move query traffic.",
+      },
+    ],
+    "Durable documents publish changes to a queue. Indexers update partitioned inverted indexes. Query coordinators fan out to one replica per shard, merge top-k candidates, and return ranked results.",
+    [
+      "More shards increase parallelism but add query fan-out and merge cost.",
+      "More replicas improve query throughput but multiply index storage.",
+      "Asynchronous indexing protects writes but makes search eventually consistent.",
+    ],
+    "One index shard is unavailable during peak search traffic. Explain replica routing, partial results, timeouts, and user-visible behavior.",
   ),
   video: guide(
     "Video systems separate a small metadata control plane from a huge media-byte data plane.",

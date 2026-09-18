@@ -25,11 +25,13 @@ describe("practice systems", () => {
       "kv-store",
       "unique-ids",
       "url-shortener",
+      "pastebin",
       "web-crawler",
       "notifications",
       "news-feed",
       "chat",
       "autocomplete",
+      "large-scale-search",
       "video",
       "cloud-files",
     ]);
@@ -89,6 +91,14 @@ describe("practice systems", () => {
       "chat",
     ]);
     expect(parseProblemProgress(null).completed).toEqual([]);
+    const problem = getProblem("chat")!;
+    const design = starterForProblem(problem);
+    expect(
+      parseProblemProgress({
+        completed: [],
+        designs: { chat: design, broken: { title: "no graph" } },
+      }).designs,
+    ).toEqual({ chat: design });
   });
 });
 

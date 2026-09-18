@@ -332,10 +332,10 @@ function DiagramInner({
             : "Read-only diagram. Pan, zoom, and export."}
         </p>
       </div>
-      <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 flex-1 flex-col sm:flex-row">
         {editable ? (
-          <aside className="flex w-[176px] shrink-0 flex-col gap-0.5 overflow-y-auto border-r border-border bg-muted/40 p-2">
-            <p className="px-2 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <aside className="flex w-full shrink-0 flex-row gap-0.5 overflow-x-auto border-b border-border bg-muted/40 p-2 sm:w-[176px] sm:flex-col sm:overflow-x-visible sm:overflow-y-auto sm:border-b-0 sm:border-r">
+            <p className="hidden px-2 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground sm:block">
               Add component
             </p>
             {COMPONENT_PALETTE.map((item) => {
@@ -352,7 +352,7 @@ function DiagramInner({
                   }}
                   onClick={() => addAt(item.type)}
                   className={cn(
-                    "flex items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] font-medium hover:bg-accent",
+                    "flex shrink-0 items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] font-medium hover:bg-accent",
                     highlighted
                       ? "bg-primary/10 text-foreground ring-1 ring-primary/40"
                       : "text-foreground",

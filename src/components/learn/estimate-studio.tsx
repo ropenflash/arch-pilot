@@ -5,10 +5,15 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Lightbulb } from "lucide-react";
 import { LearnPathHeader } from "@/components/learn/learn-chrome";
+import {
+  AvailabilityReliabilityLab,
+  LatencyPathLab,
+} from "@/components/learn/reliability-labs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { recordExercise } from "@/lib/learn/platform-progress";
 import {
   AVAILABILITY_LEVELS,
   BYTE_UNITS,
@@ -163,7 +168,10 @@ function UnitsPanel() {
           type="number"
           min={0}
           value={bytes}
-          onChange={(event) => setBytes(Number(event.target.value) || 0)}
+          onChange={(event) => {
+            setBytes(Number(event.target.value) || 0);
+            recordExercise("estimate-units");
+          }}
           className="mt-1"
         />
         <p className="mt-3 text-2xl font-semibold">{fmtBytes(bytes)}</p>
@@ -214,6 +222,7 @@ function LatencyPanel() {
           </li>
         ))}
       </ul>
+      <LatencyPathLab />
     </div>
   );
 }
@@ -233,7 +242,10 @@ function UptimePanel() {
           <button
             key={level.label}
             type="button"
-            onClick={() => setRatio(level.ratio)}
+            onClick={() => {
+              setRatio(level.ratio);
+              recordExercise("availability-calculator");
+            }}
             className={cn(
               "rounded-full border px-3 py-1.5 text-sm",
               ratio === level.ratio
@@ -271,6 +283,7 @@ function UptimePanel() {
         gap is replicas, failover drills, and multi-region — not a prettier SLA
         slide.
       </p>
+      <AvailabilityReliabilityLab />
     </div>
   );
 }
@@ -418,7 +431,13 @@ function ScenarioCalc({ scenarioId }: { scenarioId: ScenarioId }) {
               className="max-w-[12rem]"
               aria-label="Guess average QPS"
             />
-            <Button type="button" onClick={() => setRevealed(true)}>
+            <Button
+              type="button"
+              onClick={() => {
+                setRevealed(true);
+                recordExercise(`estimate-${scenario.id}`);
+              }}
+            >
               Check my guess
             </Button>
           </div>

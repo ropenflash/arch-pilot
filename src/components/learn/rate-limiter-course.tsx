@@ -11,6 +11,7 @@ import {
   rateLimiterLessonHref,
   type RateLimiterSection,
 } from "@/lib/learn/rate-limiter-course";
+import { recordConcept, recordQuiz } from "@/lib/learn/platform-progress";
 import { cn } from "@/lib/utils";
 
 export function RateLimiterCourse({
@@ -23,6 +24,17 @@ export function RateLimiterCourse({
   const next = RATE_LIMITER_SECTIONS[index + 1];
   const [choice, setChoice] = useState<string | null>(null);
 
+  function chooseAnswer(id: string) {
+    const answer = section.checkpoint.choices.find((item) => item.id === id);
+    setChoice(id);
+    if (!answer) return;
+    recordQuiz(`rate-limiter-${section.id}`, {
+      correct: answer.correct,
+      area: section.id === "distributed" ? "distributed" : "scalability",
+    });
+    if (answer.correct) recordConcept(`rate-limiter-${section.id}`);
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       <div className="grid items-start gap-8 lg:grid-cols-[230px_minmax(0,1fr)]">
@@ -34,6 +46,11 @@ export function RateLimiterCourse({
           </p>
           <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-muted">
             <div
+              role="progressbar"
+              aria-label="Rate limiter course progress"
+              aria-valuemin={1}
+              aria-valuemax={RATE_LIMITER_SECTIONS.length}
+              aria-valuenow={index + 1}
               className="h-full rounded-full bg-primary transition-all"
               style={{ width: `${((index + 1) / RATE_LIMITER_SECTIONS.length) * 100}%` }}
             />
@@ -138,7 +155,8 @@ export function RateLimiterCourse({
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => setChoice(item.id)}
+                    onClick={() => chooseAnswer(item.id)}
+                    aria-pressed={picked}
                     className={cn(
                       "w-full rounded-xl border px-4 py-3 text-left text-sm leading-6",
                       !picked && "border-border hover:border-primary/40 hover:bg-accent",
