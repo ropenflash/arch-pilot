@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { AlertTriangle, ArrowRight, Plus, RotateCcw, Server, X } from "lucide-react";
+import { AlertTriangle, ArrowRight, Plus, RotateCcw, X } from "lucide-react";
 import { LearnPathHeader } from "@/components/learn/learn-chrome";
 import { Button } from "@/components/ui/button";
 import { recordConcept, recordExercise } from "@/lib/learn/platform-progress";
