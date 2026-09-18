@@ -50,7 +50,7 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
   const [hint, setHint] = useState(false);
   const [coachOpen, setCoachOpen] = useState(false);
   const [guideStep, setGuideStep] = useState(0);
-  const grade = useMemo(() => evaluateChecks(design, problem.checks), [design, problem]);
+  const grade = evaluateChecks(design, problem.checks);
   const done = progress.completed.includes(problem.id);
 
   function markDone() {
