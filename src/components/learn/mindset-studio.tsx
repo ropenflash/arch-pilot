@@ -156,6 +156,7 @@ export function MindsetStudio({ lesson }: { lesson: MindsetLesson }) {
                     key={choice.id}
                     type="button"
                     onClick={() => choose(choice.id)}
+                    aria-pressed={active}
                     className={cn(
                       "w-full rounded-xl border px-4 py-3 text-left text-sm",
                       !active && "border-border hover:border-primary/40",

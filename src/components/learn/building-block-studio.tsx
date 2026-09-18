@@ -208,6 +208,7 @@ export function BuildingBlockStudio({ block }: { block: BuildingBlock }) {
                     key={option.id}
                     type="button"
                     onClick={() => choose(option.id)}
+                    aria-pressed={active}
                     className={cn(
                       "w-full rounded-xl border bg-card px-4 py-3 text-left text-sm",
                       !active && "border-border hover:border-primary/40",

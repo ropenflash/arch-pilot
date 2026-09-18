@@ -164,6 +164,11 @@ export function LearnHub() {
 
       <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-muted">
         <div
+          role="progressbar"
+          aria-label="Overall learning progress"
+          aria-valuemin={0}
+          aria-valuemax={lessons.length + PRACTICE_PROBLEMS.length}
+          aria-valuenow={doneCount + problemsDone.completed.length}
           className="h-full rounded-full bg-primary transition-all"
           style={{
             width: `${Math.min(
@@ -241,7 +246,7 @@ function LessonStage({
   const stageDone = stageLessons.filter((lesson) => completed.includes(lesson.slug)).length;
   const first = firstLessonOfStage(stage);
   return (
-    <li id={stage.id}>
+    <li id={stage.id} className="scroll-mt-24">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
@@ -324,7 +329,7 @@ function LessonStage({
 function ProblemsStage({ completed }: { completed: string[] }) {
   const stage = COURSE_STAGES.find((item) => item.id === "designs")!;
   return (
-    <li id="designs">
+    <li id="designs" className="scroll-mt-24">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">

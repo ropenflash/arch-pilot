@@ -70,14 +70,14 @@ export function MiniArchitecture() {
         </div>
         <div className="grid lg:grid-cols-[1fr_270px]">
           <div className="overflow-x-auto p-5 sm:p-8">
-            <div className="flex min-w-[760px] items-center gap-2">
+            <div className="flex min-w-[680px] items-center gap-2">
               {NODES.map((node, index) => (
                 <div key={node.id} className="contents">
                   <button
                     type="button"
                     onClick={() => setActive(node.id)}
                     className={cn(
-                      "min-w-28 rounded-lg border px-3 py-4 text-center transition-colors",
+                      "min-w-24 rounded-lg border px-2 py-4 text-center transition-colors",
                       active === node.id
                         ? "border-primary bg-primary/10"
                         : "border-border bg-background hover:border-primary/40",

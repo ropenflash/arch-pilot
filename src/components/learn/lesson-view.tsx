@@ -170,6 +170,7 @@ export function LessonView({ lesson }: { lesson: Lesson }) {
                     key={item.id}
                     type="button"
                     onClick={() => pick(item.id)}
+                    aria-pressed={selected}
                     className={cn(
                       "w-full rounded-xl border px-3 py-3 text-left text-sm leading-6",
                       selected

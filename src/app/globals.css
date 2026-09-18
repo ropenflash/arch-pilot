@@ -149,6 +149,11 @@ body {
   line-height: 1.5;
 }
 
+/* Compatibility alias for legacy design-panel labels. */
+.text-foreground0 {
+  color: var(--muted-foreground);
+}
+
 .react-flow {
   --xy-background-color: var(--xy-bg);
   --xy-node-border-default: var(--border);
