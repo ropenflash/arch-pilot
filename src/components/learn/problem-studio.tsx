@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { BookOpen, Check, ChevronRight, Lightbulb } from "lucide-react";
 import { ArchitectureStudio } from "@/components/architecture/architecture-studio";
+import { DesignFeedbackPanel } from "@/components/learn/design-feedback-panel";
 import { LearnPathHeader } from "@/components/learn/learn-chrome";
 import { Button } from "@/components/ui/button";
 import { evaluateChecks } from "@/lib/learn/grade";
 import { getProblemGuide } from "@/lib/learn/problem-guides";
 import { rateLimiterLessonHref } from "@/lib/learn/rate-limiter-course";
+import { getCaseStudySpec } from "@/lib/learn/case-study-specs";
 import {
   PRACTICE_PROBLEMS,
   getProblem,
@@ -31,6 +33,7 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
   const next = PRACTICE_PROBLEMS[index + 1];
   const prev = PRACTICE_PROBLEMS[index - 1];
   const guide = getProblemGuide(problem.id);
+  const spec = getCaseStudySpec(problem.id);
 
   const snapshot = useSyncExternalStore(
     subscribeProblemProgress,
@@ -65,6 +68,19 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
         stageId="designs"
         detail={`${index + 1} of ${PRACTICE_PROBLEMS.length}`}
       />
+      <ol className="mb-5 grid grid-cols-5 overflow-hidden rounded-lg border border-border bg-card text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+        {["Clarify", "Estimate", "API + data", "Design", "Evaluate"].map((phase, phaseIndex) => (
+          <li
+            key={phase}
+            className={cn(
+              "border-r border-border px-1 py-2 last:border-r-0",
+              phaseIndex === 3 && "bg-primary/10 text-primary",
+            )}
+          >
+            {phaseIndex + 1}. {phase}
+          </li>
+        ))}
+      </ol>
 
       <div className="grid items-start gap-5 xl:grid-cols-[minmax(300px,380px)_minmax(0,1fr)]">
         <aside className="rounded-2xl border border-border bg-card p-5 xl:sticky xl:top-20 xl:max-h-[calc(100vh-6.5rem)] xl:overflow-y-auto">
@@ -219,6 +235,40 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
             <span className="text-muted-foreground">{problem.skip}</span>
           </p>
 
+          {spec ? (
+            <details className="mt-4 rounded-xl border border-border bg-muted/40 px-3 py-2">
+              <summary className="cursor-pointer text-sm font-medium">
+                API + data model starting point
+              </summary>
+              <div className="mt-3 border-t border-border pt-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.1em] text-primary">
+                  APIs
+                </p>
+                <ul className="mt-1 space-y-1 font-mono text-[11px] leading-5 text-muted-foreground">
+                  {spec.apis.map((api) => (
+                    <li key={api}>{api}</li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-xs font-semibold uppercase tracking-[0.1em] text-primary">
+                  Data
+                </p>
+                <ul className="mt-1 space-y-1 text-xs leading-5 text-muted-foreground">
+                  {spec.entities.map((entity) => (
+                    <li key={entity}>• {entity}</li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-xs leading-5">
+                  <span className="font-semibold">Primary flow: </span>
+                  <span className="text-muted-foreground">{spec.primaryFlow}</span>
+                </p>
+                <p className="mt-2 text-xs leading-5">
+                  <span className="font-semibold">Likely bottleneck: </span>
+                  <span className="text-muted-foreground">{spec.bottleneck}</span>
+                </p>
+              </div>
+            </details>
+          ) : null}
+
           <ul className="mt-5 space-y-2">
             {grade.results.map((result) => (
               <li key={result.id} className="flex items-start gap-2.5 text-sm leading-5">
@@ -239,7 +289,7 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
 
           <div className="mt-5 flex flex-wrap gap-2">
             <Button type="button" variant={grade.passed ? "secondary" : "default"} onClick={() => setChecked(true)}>
-              Check my board
+              Evaluate design
             </Button>
             {grade.passed ? (
               <Button type="button" onClick={markDone}>
@@ -261,7 +311,8 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
           </div>
           {checked && !grade.passed ? (
             <p className="mt-3 text-sm text-muted-foreground">
-              Fill the empty rows. Start from the client and the v1 list.
+              The checklist is not complete yet. Review the observations below,
+              change one decision, then evaluate again.
             </p>
           ) : null}
 
@@ -298,6 +349,7 @@ export function ProblemStudio({ problemId }: { problemId: string }) {
             compact
             canvasKey={problem.id}
           />
+          {checked ? <DesignFeedbackPanel design={design} problem={problem} /> : null}
         </div>
       </div>
     </div>

@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { MousePointerClick, Spline, Trash2, Unplug, X } from "lucide-react";
 import { useMemo, useState } from "react";
+import { COMPONENT_TRADEOFFS } from "@/lib/learn/design-feedback";
 
 const selectClass =
   "flex h-10 w-full rounded-md border border-input bg-background px-2.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50";
@@ -129,6 +130,7 @@ function NodeInspector({
 
   if (!component) return null;
   const deps = dependenciesFor(design, selectedId);
+  const guidance = COMPONENT_TRADEOFFS[component.type];
 
   const patch = (next: Parameters<typeof updateComponent>[2]) => {
     onDesignChange?.(updateComponent(design, selectedId, next));
@@ -160,6 +162,21 @@ function NodeInspector({
           <X className="h-4 w-4" />
         </Button>
       </div>
+
+      {guidance ? (
+        <section className="mb-5 rounded-xl border border-primary/25 bg-primary/5 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
+            Why this component?
+          </p>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            {guidance.benefits[0]}. It also introduces {guidance.costs[0].toLowerCase()}.
+          </p>
+          <p className="mt-3 text-xs font-semibold">Ask yourself</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {guidance.question}
+          </p>
+        </section>
+      ) : null}
 
       {editable ? (
         <div className="space-y-4">

@@ -25,11 +25,13 @@ describe("practice systems", () => {
       "kv-store",
       "unique-ids",
       "url-shortener",
+      "pastebin",
       "web-crawler",
       "notifications",
       "news-feed",
       "chat",
       "autocomplete",
+      "large-scale-search",
       "video",
       "cloud-files",
     ]);

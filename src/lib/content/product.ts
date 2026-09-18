@@ -4,9 +4,9 @@ export const PRODUCT = {
   documentTitle: "ArchPilot — System Design Copilot",
   tagline: "Design better systems with AI.",
   description:
-    "Describe what you're building. ArchPilot turns your requirements into architecture, capacity estimates, trade-offs and failure scenarios.",
+    "Learn system design by clarifying requirements, estimating load, building architecture, and reasoning through trade-offs.",
   longDescription:
-    "Describe the system as you would to a principal architect. ArchPilot returns requirements, deterministic capacity math, a component architecture, APIs, a data model, trade-offs, failure scenarios, an interactive diagram, and a skeptical review — the decisions that come before the code.",
+    "ArchPilot is an interactive system-design learning platform: understand the problem, estimate scale, build the architecture, simulate pressure, and explain every decision.",
   primaryCta: "Create System Design",
   secondaryCta: "View Examples",
   learnCta: "Learn the path",
@@ -90,7 +90,7 @@ export const PRODUCT = {
   ],
   examplesHeadline: "Design these systems",
   examplesLead:
-    "Twelve written interview problems, each with four guided moves, nudges, trade-offs, a reference approach, and a failure drill.",
+    "Written interview problems with guided moves, nudges, trade-offs, a reference approach, and a failure drill.",
   formLead:
     "Describe the system as you would to a principal architect, then generate an architecture — or start on a blank canvas and design the diagram yourself. Optional scale fields make capacity math deterministic.",
   reviewEmpty:
