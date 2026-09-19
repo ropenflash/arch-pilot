@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import { RateLimiterCourse } from "@/components/learn/rate-limiter-course";
 import {
-  RATE_LIMITER_SECTIONS,
   getRateLimiterSection,
+  rateLimiterStaticParams,
 } from "@/lib/learn/rate-limiter-course";
 
 export function generateStaticParams() {
-  return RATE_LIMITER_SECTIONS.map((section) => ({ section: section.id }));
+  return rateLimiterStaticParams();
 }
 
 export async function generateMetadata({

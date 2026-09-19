@@ -1,28 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowDown, ArrowRight, Check, X } from "lucide-react";
+import { ArrowDown, ArrowRight } from "lucide-react";
 import { RateLimiterAlgorithmPlayground } from "@/components/learn/rate-limiter-algorithm-playground";
-import type { RateLimiterDiagram, RateLimiterInterviewTurn } from "@/lib/learn/rate-limiter-course";
+import type { RateLimiterDiagram } from "@/lib/learn/rate-limiter-course";
 import { cn } from "@/lib/utils";
 
-export function RateLimiterLessonDiagram({
-  kind,
-  interview,
-  decided,
-}: {
-  kind: RateLimiterDiagram;
-  interview?: RateLimiterInterviewTurn[];
-  decided?: { title: string; body: string }[];
-}) {
+export function RateLimiterLessonDiagram({ kind }: { kind: RateLimiterDiagram }) {
   if (kind === "why") return <WhyDiagram />;
-  if (kind === "scope") return <ScopeDiagram interview={interview ?? []} decided={decided ?? []} />;
-  if (kind === "requirements") return <RequirementsDiagram />;
+  if (kind === "brief") return <BriefDiagram />;
   if (kind === "placement") return <PlacementDiagram />;
   if (kind === "algorithms") return <AlgorithmLab />;
-  if (kind === "single-node") return <SingleNodeDiagram />;
-  if (kind === "distributed") return <DistributedDiagram />;
-  return <OperationsDiagram />;
+  return <DesignDiagram />;
 }
 
 function Frame({
@@ -80,193 +69,87 @@ function FlowArrow({ label }: { label?: string }) {
 }
 
 function WhyDiagram() {
-  const [mode, setMode] = useState<"open" | "limited">("open");
+  const [on, setOn] = useState(false);
 
   return (
     <Frame
-      title="Watch the doorway"
-      caption="Toggle the limiter on. Extra requests stop here instead of landing on the API."
+      title="Watch one request path"
+      caption="Turn the limiter on. Seven of the ten requests are asked to wait."
     >
       <div className="flex flex-wrap gap-2">
-        {(
-          [
-            ["open", "No limiter"],
-            ["limited", "Limiter on"],
-          ] as const
-        ).map(([id, label]) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setMode(id)}
-            aria-pressed={mode === id}
-            className={cn(
-              "rounded-full border px-3 py-1.5 text-xs font-medium",
-              mode === id
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border hover:border-primary/40",
-            )}
-          >
-            {label}
-          </button>
-        ))}
+        <button
+          type="button"
+          onClick={() => setOn(false)}
+          aria-pressed={!on}
+          className={cn(
+            "rounded-full border px-3 py-1.5 text-xs font-medium",
+            !on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary/40",
+          )}
+        >
+          No limiter
+        </button>
+        <button
+          type="button"
+          onClick={() => setOn(true)}
+          aria-pressed={on}
+          className={cn(
+            "rounded-full border px-3 py-1.5 text-xs font-medium",
+            on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary/40",
+          )}
+        >
+          Limiter on
+        </button>
       </div>
       <div className="mt-6 flex items-center justify-center overflow-x-auto py-4">
         <Box title="Caller" detail="10 requests" />
         <FlowArrow label="arrives" />
-        {mode === "limited" ? (
+        {on ? (
           <>
-            <Box title="Rate limiter" detail="rule: 3 / second" tone="primary" />
+            <Box title="Rate limiter" detail="3 / second" tone="primary" />
             <FlowArrow label="3 allowed" />
           </>
         ) : null}
         <Box
           title="API"
-          detail={mode === "limited" ? "does useful work" : "handles all 10"}
-          tone={mode === "open" ? "danger" : "plain"}
+          detail={on ? "does the work" : "handles all 10"}
+          tone={on ? "plain" : "danger"}
         />
       </div>
-      <div
-        className={cn(
-          "rounded-xl p-4",
-          mode === "open" ? "bg-red-500/10" : "bg-emerald-500/10",
-        )}
-      >
-        <p className="text-sm font-semibold">
-          {mode === "open" ? "Every request reaches the API" : "The extra 7 are asked to wait"}
-        </p>
-        <p className="mt-1 text-sm leading-6 text-muted-foreground">
-          {mode === "open"
-            ? "A stuck retry loop, a bot, or a popular endpoint can spend the same CPU and vendor budget as real users."
-            : "Three requests continue. Seven receive a clear “try later.” The API only sees traffic that is still inside the rule."}
-        </p>
-      </div>
+      <p className="text-sm leading-6 text-muted-foreground">
+        {on
+          ? "Three requests continue. Seven get a clear “try later.” The API only sees traffic inside the rule."
+          : "Every request reaches the API — including retries, bots, and a stuck loop."}
+      </p>
     </Frame>
   );
 }
 
-function ScopeDiagram({
-  interview,
-  decided,
-}: {
-  interview: RateLimiterInterviewTurn[];
-  decided: { title: string; body: string }[];
-}) {
-  const [step, setStep] = useState(0);
-  const [revealed, setRevealed] = useState(false);
-  const current = interview[step];
-  const done = step >= interview.length;
-
-  function next() {
-    setRevealed(false);
-    setStep((value) => value + 1);
-  }
-
+function BriefDiagram() {
   return (
     <Frame
-      title="Walk the interview"
-      caption="Ask first. Then reveal a solid answer. This is the same habit you should use on a real design prompt."
+      title="The brief we just locked"
+      caption="Read this once. The later pictures all follow it."
     >
-      {!done && current ? (
-        <div className="space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-            Question {step + 1} of {interview.length}
-          </p>
-          <p className="text-lg font-semibold leading-7">{current.ask}</p>
-          {revealed ? (
-            <div className="rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 text-sm leading-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
-                A solid answer
-              </p>
-              <p className="mt-2">{current.answer}</p>
-              <p className="mt-2 text-xs text-muted-foreground">{current.takeaway}</p>
-              <button
-                type="button"
-                onClick={next}
-                className="mt-3 text-xs font-medium text-primary hover:underline"
-              >
-                {step + 1 === interview.length ? "Lock the brief →" : "Next question →"}
-              </button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setRevealed(true)}
-              className="rounded-xl border border-border bg-muted/40 px-4 py-3 text-sm font-medium hover:border-primary/40 hover:bg-accent"
-            >
-              Reveal a solid answer
-            </button>
-          )}
-        </div>
-      ) : (
-        <div>
-          <p className="text-sm font-semibold">The brief is now locked</p>
-          <p className="mt-1 text-sm leading-6 text-muted-foreground">
-            Server-side API limiter. Flexible identity. High traffic across many servers. Tell the caller when they are limited.
-          </p>
-          {decided.length ? (
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              {decided.map((item) => (
-                <div key={item.title}>
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
-                    {item.title}
-                  </p>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.body}</p>
-                </div>
-              ))}
-            </div>
-          ) : null}
-          <button
-            type="button"
-            onClick={() => {
-              setStep(0);
-              setRevealed(false);
-            }}
-            className="mt-4 text-xs font-medium text-primary hover:underline"
-          >
-            Walk through the questions again
-          </button>
-        </div>
-      )}
-    </Frame>
-  );
-}
-
-const REQUIREMENT_CARDS = [
-  ["Accurate", "The 21st request does not sneak through."],
-  ["Fast", "The check barely adds wait time."],
-  ["Small memory", "Do not store the whole internet."],
-  ["Shared", "Many servers, one quota."],
-  ["Clear error", "Rejected callers know when to retry."],
-  ["Fault tolerant", "A sick store does not sink the product."],
-] as const;
-
-function RequirementsDiagram() {
-  const [active, setActive] = useState(0);
-
-  return (
-    <Frame
-      title="Six bars you can point to"
-      caption="Click a requirement. If a design misses it, say that out loud before you add more boxes."
-    >
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {REQUIREMENT_CARDS.map(([title, detail], index) => (
-          <button
-            key={title}
-            type="button"
-            onClick={() => setActive(index)}
-            aria-pressed={active === index}
-            className={cn(
-              "rounded-xl border px-3 py-3 text-left",
-              active === index
-                ? "border-primary bg-primary/10"
-                : "border-border hover:border-primary/40",
-            )}
-          >
-            <p className="text-sm font-semibold">{title}</p>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">{detail}</p>
-          </button>
-        ))}
-      </div>
+      <ul className="space-y-3 text-sm leading-6 text-muted-foreground">
+        <li>
+          <span className="font-semibold text-foreground">Server-side.</span> The lock lives on machines we control.
+        </li>
+        <li>
+          <span className="font-semibold text-foreground">Flexible identity.</span> One route may count by user, another by IP or key.
+        </li>
+        <li>
+          <span className="font-semibold text-foreground">Fast and small.</span> The check is on every request, so it cannot be heavy.
+        </li>
+        <li>
+          <span className="font-semibold text-foreground">Shared across servers.</span> The same caller can land on any machine.
+        </li>
+        <li>
+          <span className="font-semibold text-foreground">A clear wait.</span> Blocked callers are told when to retry.
+        </li>
+        <li>
+          <span className="font-semibold text-foreground">A planned failure.</span> If the counter store is sick, the product still has an answer.
+        </li>
+      </ul>
     </Frame>
   );
 }
@@ -274,28 +157,16 @@ function RequirementsDiagram() {
 function PlacementDiagram() {
   const [stage, setStage] = useState<"simple" | "client" | "api" | "gateway">("simple");
   const notes = {
-    simple: {
-      verdict: "Start here",
-      body: "Client talks to a server. That is enough to ask the next question: where does the check go?",
-    },
-    client: {
-      verdict: "Helpful, but not a lock",
-      body: "A local throttle can make the app feel polite. A changed or hostile client can skip it.",
-    },
-    api: {
-      verdict: "Trusted and close to the product",
-      body: "The service can use the logged-in account. Every team must keep the same logic.",
-    },
-    gateway: {
-      verdict: "One shared doorway",
-      body: "Rejects early and protects many services. Deeper business rules can still live in the API.",
-    },
+    simple: "Start here. Client talks to a server. Now we choose the doorway.",
+    client: "This can make the app feel polite. It cannot be the lock — the user controls the client.",
+    api: "Trusted, and it can see the logged-in account. Every team must keep the same logic.",
+    gateway: "One shared doorway. It rejects early. Deeper rules can still live in the API.",
   };
 
   return (
     <Frame
-      title="Grow the picture one box at a time"
-      caption="First the basic path. Then click a place to put the limiter. The orange box is the decision."
+      title="Grow the picture"
+      caption="Four clicks. The orange box is the decision."
     >
       <div className="flex flex-wrap gap-2">
         {(
@@ -340,222 +211,124 @@ function PlacementDiagram() {
           </>
         ) : null}
         <Box
-          title={stage === "simple" ? "Server" : "API service"}
+          title={stage === "simple" ? "Server" : "API"}
           detail={stage === "api" ? "limiter here" : "does the work"}
           tone={stage === "api" ? "primary" : "plain"}
         />
       </div>
-      <div className="rounded-xl bg-muted p-4">
-        <p className="text-sm font-semibold">{notes[stage].verdict}</p>
-        <p className="mt-1 text-sm leading-6 text-muted-foreground">{notes[stage].body}</p>
-      </div>
+      <p className="text-sm leading-6 text-muted-foreground">{notes[stage]}</p>
     </Frame>
   );
 }
-
-const ALGORITHMS = [
-  {
-    name: "Token bucket",
-    burst: "Short burst, then steady",
-    memory: "Tiny",
-    accuracy: "Exact tokens",
-    best: "Public APIs that can allow a burst",
-  },
-  {
-    name: "Leaky bucket",
-    burst: "Lined up and smoothed",
-    memory: "The queue",
-    accuracy: "Fixed outflow",
-    best: "Downstream work needs a calm pace",
-  },
-  {
-    name: "Fixed window",
-    burst: "Spike at the clock flip",
-    memory: "Tiny",
-    accuracy: "Coarse",
-    best: "Simple “N per minute” rules",
-  },
-  {
-    name: "Sliding log",
-    burst: "Strict rolling cap",
-    memory: "High",
-    accuracy: "Exact times",
-    best: "Low volume, strict rules",
-  },
-  {
-    name: "Sliding counter",
-    burst: "Smoothed estimate",
-    memory: "Low",
-    accuracy: "Approximate",
-    best: "High volume rolling limits",
-  },
-];
 
 function AlgorithmLab() {
-  return (
-    <div className="space-y-5">
-      <RateLimiterAlgorithmPlayground />
-      <Frame
-        title="Choose by the feeling, not the name"
-        caption="No algorithm is always best. Match the burst, the memory, and the promise you made."
-      >
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[680px] text-left text-xs">
-            <thead>
-              <tr className="border-b border-border text-muted-foreground">
-                <th className="pb-3 pr-4 font-medium">Algorithm</th>
-                <th className="pb-3 pr-4 font-medium">What a burst does</th>
-                <th className="pb-3 pr-4 font-medium">Memory</th>
-                <th className="pb-3 pr-4 font-medium">Accuracy</th>
-                <th className="pb-3 font-medium">Good fit</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ALGORITHMS.map((item) => (
-                <tr key={item.name} className="border-b border-border/70 last:border-0">
-                  <td className="py-3 pr-4 font-semibold">{item.name}</td>
-                  <td className="py-3 pr-4 text-muted-foreground">{item.burst}</td>
-                  <td className="py-3 pr-4 text-muted-foreground">{item.memory}</td>
-                  <td className="py-3 pr-4 text-muted-foreground">{item.accuracy}</td>
-                  <td className="py-3 text-muted-foreground">{item.best}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Frame>
-    </div>
-  );
+  return <RateLimiterAlgorithmPlayground />;
 }
 
-function SingleNodeDiagram() {
+function DesignDiagram() {
+  const [stage, setStage] = useState<"one" | "many" | "wait">("one");
+
   return (
     <Frame
-      title="The smallest complete path"
-      caption="Rules change slowly. Counts change on every request. Give them different homes."
+      title="The same design, three moments"
+      caption="One machine. Then two servers. Then a blocked caller."
     >
-      <div className="flex items-center justify-center overflow-x-auto py-3">
-        <Box title="Client" detail="sends a request" />
-        <FlowArrow label="request" />
-        <Box title="Limiter" detail="load rule, then decide" tone="primary" />
-        <FlowArrow label="allowed" />
-        <Box title="API" detail="does the work" />
-      </div>
-      <div className="mx-auto mt-2 flex max-w-lg justify-center gap-12">
-        <div className="flex flex-col items-center">
-          <ArrowDown className="h-5 w-5 text-sky-600" />
-          <Box title="Rule cache" detail="20 logins / 10 min" tone="data" />
-        </div>
-        <div className="flex flex-col items-center">
-          <ArrowDown className="h-5 w-5 text-sky-600" />
-          <Box title="Counter store" detail="account 42 = 7" tone="data" />
-        </div>
-      </div>
-      <ol className="mt-5 grid gap-2 sm:grid-cols-4">
-        {[
-          "Find the rule",
-          "Read the count",
-          "Add one atomically",
-          "Allow or return 429",
-        ].map((step, index) => (
-          <li key={step} className="rounded-xl border border-border bg-muted/40 px-3 py-3">
-            <p className="text-[11px] font-semibold text-primary">Step {index + 1}</p>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">{step}</p>
-          </li>
+      <div className="flex flex-wrap gap-2">
+        {(
+          [
+            ["one", "1. One machine"],
+            ["many", "2. Many servers"],
+            ["wait", "3. A blocked caller"],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setStage(id)}
+            aria-pressed={stage === id}
+            className={cn(
+              "rounded-full border px-3 py-1.5 text-xs font-medium",
+              stage === id
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border hover:border-primary/40",
+            )}
+          >
+            {label}
+          </button>
         ))}
-      </ol>
-    </Frame>
-  );
-}
+      </div>
 
-function DistributedDiagram() {
-  return (
-    <div className="space-y-5">
-      <Frame
-        title="Problem: each server has its own memory"
-        caption="The same account hits two healthy limiters. Each one only sees half the traffic."
-      >
-        <div className="grid gap-4 sm:grid-cols-2">
-          {["A", "B"].map((id) => (
-            <div key={id} className="flex items-center justify-center">
-              <Box title={`Caller ${id}`} />
-              <FlowArrow />
-              <Box title={`Limiter ${id}`} detail="local count = 3" tone="danger" />
+      {stage === "one" ? (
+        <div className="mt-6">
+          <div className="flex items-center justify-center overflow-x-auto py-3">
+            <Box title="Client" />
+            <FlowArrow label="request" />
+            <Box title="Limiter" detail="load rule, then decide" tone="primary" />
+            <FlowArrow label="allowed" />
+            <Box title="API" />
+          </div>
+          <div className="mx-auto mt-2 flex max-w-md justify-center gap-10">
+            <div className="flex flex-col items-center">
+              <ArrowDown className="h-5 w-5 text-sky-600" />
+              <Box title="Rules" detail="20 logins / 10 min" tone="data" />
             </div>
-          ))}
+            <div className="flex flex-col items-center">
+              <ArrowDown className="h-5 w-5 text-sky-600" />
+              <Box title="Counters" detail="account 42 = 7" tone="data" />
+            </div>
+          </div>
+          <p className="mt-4 text-sm leading-6 text-muted-foreground">
+            Find the rule, add one to the count in a single step, then allow or wait.
+          </p>
         </div>
-        <p className="mt-4 rounded-lg bg-red-500/10 px-3 py-2 text-center text-xs text-red-700 dark:text-red-300">
-          Each allows 3. The intended shared limit of 5 is already broken.
-        </p>
-      </Frame>
-      <Frame
-        title="Fix: stateless limiters, one shared count"
-        caption="Any limiter can serve any caller. The full key chooses the counter."
-      >
-        <div className="flex items-center justify-center overflow-x-auto py-3">
-          <div className="space-y-3">
+      ) : null}
+
+      {stage === "many" ? (
+        <div className="mt-6 space-y-5">
+          <div className="grid gap-3 sm:grid-cols-2">
+            {["A", "B"].map((id) => (
+              <div key={id} className="flex items-center justify-center">
+                <Box title={`Caller ${id}`} />
+                <FlowArrow />
+                <Box title={`Limiter ${id}`} detail="local count = 3" tone="danger" />
+              </div>
+            ))}
+          </div>
+          <p className="text-sm leading-6 text-muted-foreground">
+            Each server allows 3. The intended shared limit of 5 is already broken.
+          </p>
+          <div className="flex items-center justify-center overflow-x-auto py-3">
             <Box title="Limiter A" detail="no local count" tone="primary" />
+            <FlowArrow label="same key" />
+            <Box title="Shared count" detail="account 42 = 5" tone="data" />
+            <FlowArrow />
             <Box title="Limiter B" detail="no local count" tone="primary" />
           </div>
-          <FlowArrow label="same key" />
-          <Box title="Shared counter" detail="account 42 = 5" tone="data" />
-        </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-3">
-          <MiniNote title="Agree" body="One atomic increment, so two servers cannot both invent a +1." />
-          <MiniNote title="Scale" body="Split keys across shards when one store is not enough." />
-          <MiniNote title="Later" body="A hard worldwide cap costs extra coordination." />
-        </div>
-      </Frame>
-    </div>
-  );
-}
-
-function OperationsDiagram() {
-  return (
-    <Frame
-      title="The caller and the bad day"
-      caption="The hot path stays short. The response and the fallback are part of the design."
-    >
-      <div className="flex items-center justify-center overflow-x-auto py-3">
-        <Box title="Client" detail="waits, then retries" />
-        <FlowArrow label="request" />
-        <Box title="Limiter" detail="allow or 429" tone="primary" />
-        <FlowArrow label="allowed" />
-        <Box title="API" />
-      </div>
-      <div className="mt-5 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
-          <p className="flex items-center gap-2 text-sm font-semibold">
-            <X className="h-4 w-4 text-red-600" />
-            Blocked response
+          <p className="text-sm leading-6 text-muted-foreground">
+            Any server can decide, because they all update the same key.
           </p>
-          <pre className="mt-2 overflow-x-auto text-xs leading-5 text-muted-foreground">
+        </div>
+      ) : null}
+
+      {stage === "wait" ? (
+        <div className="mt-6">
+          <div className="flex items-center justify-center overflow-x-auto py-3">
+            <Box title="Client" detail="waits, then retries" />
+            <FlowArrow />
+            <Box title="Limiter" detail="allow or 429" tone="primary" />
+            <FlowArrow label="allowed" />
+            <Box title="API" />
+          </div>
+          <pre className="mt-5 overflow-x-auto rounded-xl bg-muted px-4 py-3 text-xs leading-5 text-muted-foreground">
 {`HTTP 429
 Retry-After: 8
-Limit: 20
 Remaining: 0`}
           </pre>
-        </div>
-        <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
-          <p className="flex items-center gap-2 text-sm font-semibold">
-            <Check className="h-4 w-4 text-primary" />
-            If the store is sick
-          </p>
-          <p className="mt-2 text-xs leading-5 text-muted-foreground">
-            Browse may keep working. Password reset or a paid vendor call may refuse
-            traffic or use a small local cap. Write the choice on the rule.
+          <p className="mt-4 text-sm leading-6 text-muted-foreground">
+            If the counter store is down, browse may stay open. Password reset may stay closed. Write that on the rule.
           </p>
         </div>
-      </div>
+      ) : null}
     </Frame>
-  );
-}
-
-function MiniNote({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="rounded-xl border border-border bg-muted/40 p-3">
-      <p className="text-xs font-semibold">{title}</p>
-      <p className="mt-1 text-xs leading-5 text-muted-foreground">{body}</p>
-    </div>
   );
 }

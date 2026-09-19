@@ -122,31 +122,24 @@ describe("course stages", () => {
 });
 
 describe("rate limiter course", () => {
-  it("teaches the limiter the way an interview starts: why, questions, bar, then design", () => {
+  it("walks the limiter in five guided steps without quizzes", () => {
     expect(RATE_LIMITER_SECTIONS.map((section) => section.id)).toEqual([
       "why",
-      "scope",
-      "requirements",
+      "brief",
       "placement",
       "algorithms",
-      "single-node",
-      "distributed",
-      "operations",
+      "design",
     ]);
-    expect(RATE_LIMITER_SECTIONS.every((section) => section.intro.length >= 2)).toBe(true);
-    expect(RATE_LIMITER_SECTIONS.every((section) => section.keyPoints.length >= 4)).toBe(
+    expect(RATE_LIMITER_SECTIONS.every((section) => section.teach.length >= 2)).toBe(true);
+    expect(RATE_LIMITER_SECTIONS.every((section) => section.takeaway.length > 20)).toBe(
       true,
     );
-    expect(
-      RATE_LIMITER_SECTIONS.every((section) =>
-        section.checkpoint.choices.some((choice) => choice.correct),
-      ),
-    ).toBe(true);
-    expect(getRateLimiterSection("why")?.examples).toHaveLength(3);
-    expect(getRateLimiterSection("scope")?.interview).toHaveLength(6);
-    expect(getRateLimiterSection("requirements")?.requirements).toHaveLength(6);
-    expect(getRateLimiterSection("algorithms")?.keyPoints).toHaveLength(5);
+    expect(getRateLimiterSection("scope")?.id).toBe("brief");
+    expect(getRateLimiterSection("operations")?.id).toBe("design");
     expect(rateLimiterLessonHref()).toBe("/learn/problems/rate-limiter/learn/why");
+    expect(rateLimiterLessonHref("requirements")).toBe(
+      "/learn/problems/rate-limiter/learn/brief",
+    );
   });
 
   it("uses the chapter pattern without copying its figures or distinctive text", () => {
