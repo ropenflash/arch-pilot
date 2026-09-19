@@ -122,9 +122,11 @@ describe("course stages", () => {
 });
 
 describe("rate limiter course", () => {
-  it("evolves from requirements to an operated distributed service", () => {
+  it("teaches the limiter the way an interview starts: why, questions, bar, then design", () => {
     expect(RATE_LIMITER_SECTIONS.map((section) => section.id)).toEqual([
+      "why",
       "scope",
+      "requirements",
       "placement",
       "algorithms",
       "single-node",
@@ -140,10 +142,11 @@ describe("rate limiter course", () => {
         section.checkpoint.choices.some((choice) => choice.correct),
       ),
     ).toBe(true);
+    expect(getRateLimiterSection("why")?.examples).toHaveLength(3);
+    expect(getRateLimiterSection("scope")?.interview).toHaveLength(6);
+    expect(getRateLimiterSection("requirements")?.requirements).toHaveLength(6);
     expect(getRateLimiterSection("algorithms")?.keyPoints).toHaveLength(5);
-    expect(rateLimiterLessonHref()).toBe(
-      "/learn/problems/rate-limiter/learn/scope",
-    );
+    expect(rateLimiterLessonHref()).toBe("/learn/problems/rate-limiter/learn/why");
   });
 
   it("uses the chapter pattern without copying its figures or distinctive text", () => {

@@ -40,9 +40,9 @@ export function RateLimiterCourse({
       <div className="grid items-start gap-8 lg:grid-cols-[230px_minmax(0,1fr)]">
         <aside className="lg:sticky lg:top-20">
           <LearnPathHeader stageId="designs" detail="Rate limiter course" />
-          <p className="text-sm font-semibold">From one rule to a global service</p>
+          <p className="text-sm font-semibold">Design a rate limiter</p>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            Six short sections. Each adds only the next idea.
+            Understand the rule, write the bar, then grow the design one picture at a time.
           </p>
           <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-muted">
             <div
@@ -62,6 +62,7 @@ export function RateLimiterCourse({
                 <li key={item.id}>
                   <Link
                     href={rateLimiterLessonHref(item.id)}
+                    aria-current={active ? "page" : undefined}
                     className={cn(
                       "flex items-start gap-2.5 rounded-lg px-2 py-2 text-sm",
                       active
@@ -120,13 +121,101 @@ export function RateLimiterCourse({
             ))}
           </div>
 
+          {section.examples ? (
+            <section className="mt-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                Rules you already know
+              </p>
+              <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                {section.examples.map((example) => (
+                  <article
+                    key={example.title}
+                    className="rounded-xl border border-border bg-card p-4"
+                  >
+                    <h2 className="text-sm font-semibold">{example.title}</h2>
+                    <p className="mt-2 font-mono text-xs text-primary">{example.rule}</p>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      {example.meaning}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {section.benefits ? (
+            <section className="mt-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                Why build one at all
+              </p>
+              <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                {section.benefits.map((benefit) => (
+                  <article
+                    key={benefit.title}
+                    className="rounded-xl border border-border bg-card p-4"
+                  >
+                    <h2 className="text-sm font-semibold">{benefit.title}</h2>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      {benefit.body}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
           <div className="mt-8">
-            <RateLimiterLessonDiagram kind={section.diagram} />
+            <RateLimiterLessonDiagram
+              kind={section.diagram}
+              interview={section.interview}
+            />
           </div>
+
+          {section.decided ? (
+            <section className="mt-8 rounded-2xl border border-primary/30 bg-primary/5 p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                What we locked
+              </p>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                {section.decided.map((item) => (
+                  <div key={item.title}>
+                    <p className="text-sm font-semibold">{item.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      {item.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {section.requirements ? (
+            <section className="mt-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                If you skip a bar
+              </p>
+              <div className="mt-3 space-y-3">
+                {section.requirements.map((item) => (
+                  <article
+                    key={item.title}
+                    className="rounded-xl border border-border bg-card p-4 sm:p-5"
+                  >
+                    <h2 className="text-sm font-semibold">{item.title}</h2>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      {item.meaning}
+                    </p>
+                    <p className="mt-3 rounded-lg bg-muted px-3 py-2 text-xs leading-5 text-muted-foreground">
+                      If you skip it: {item.ifSkipped}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </section>
+          ) : null}
 
           <section className="mt-10">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-              What to understand
+              Keep these in mind
             </p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               {section.keyPoints.map((point) => (
@@ -194,8 +283,8 @@ export function RateLimiterCourse({
             <div>
               <h2 className="text-sm font-semibold">Explain it back</h2>
               <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                In two sentences, explain why this stage exists and what would break
-                if you removed it. Saying it out loud is part of the practice.
+                Say this section back in two short sentences. If you cannot, stay
+                here before you add another box.
               </p>
             </div>
           </section>
