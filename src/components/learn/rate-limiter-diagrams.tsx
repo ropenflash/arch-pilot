@@ -9,12 +9,14 @@ import { cn } from "@/lib/utils";
 export function RateLimiterLessonDiagram({
   kind,
   interview,
+  decided,
 }: {
   kind: RateLimiterDiagram;
   interview?: RateLimiterInterviewTurn[];
+  decided?: { title: string; body: string }[];
 }) {
   if (kind === "why") return <WhyDiagram />;
-  if (kind === "scope") return <ScopeDiagram interview={interview ?? []} />;
+  if (kind === "scope") return <ScopeDiagram interview={interview ?? []} decided={decided ?? []} />;
   if (kind === "requirements") return <RequirementsDiagram />;
   if (kind === "placement") return <PlacementDiagram />;
   if (kind === "algorithms") return <AlgorithmLab />;
@@ -142,7 +144,13 @@ function WhyDiagram() {
   );
 }
 
-function ScopeDiagram({ interview }: { interview: RateLimiterInterviewTurn[] }) {
+function ScopeDiagram({
+  interview,
+  decided,
+}: {
+  interview: RateLimiterInterviewTurn[];
+  decided: { title: string; body: string }[];
+}) {
   const [step, setStep] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const current = interview[step];
@@ -192,9 +200,16 @@ function ScopeDiagram({ interview }: { interview: RateLimiterInterviewTurn[] }) 
       ) : (
         <div>
           <p className="text-sm font-semibold">The brief is now locked</p>
-          <p className="mt-1 text-sm leading-6 text-muted-foreground">
-            Server-side API limiter. Flexible identity. High traffic across many servers. Tell the caller when they are limited.
-          </p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {decided.map((item) => (
+              <div key={item.title}>
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
+                  {item.title}
+                </p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.body}</p>
+              </div>
+            ))}
+          </div>
           <button
             type="button"
             onClick={() => {

@@ -55,44 +55,15 @@ export function RateLimiterCourse({
               style={{ width: `${((index + 1) / RATE_LIMITER_SECTIONS.length) * 100}%` }}
             />
           </div>
-          <ol className="mt-5 space-y-1">
-            {RATE_LIMITER_SECTIONS.map((item, itemIndex) => {
-              const active = item.id === section.id;
-              return (
-                <li key={item.id}>
-                  <Link
-                    href={rateLimiterLessonHref(item.id)}
-                    aria-current={active ? "page" : undefined}
-                    className={cn(
-                      "flex items-start gap-2.5 rounded-lg px-2 py-2 text-sm",
-                      active
-                        ? "bg-primary/10 font-medium text-foreground"
-                        : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px]",
-                        active
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : itemIndex < index
-                            ? "border-primary/50 text-primary"
-                            : "border-border",
-                      )}
-                    >
-                      {itemIndex < index ? <Check className="h-3 w-3" /> : item.number}
-                    </span>
-                    <span>
-                      {item.shortTitle}
-                      <span className="block text-[11px] font-normal text-muted-foreground">
-                        {item.minutes} min
-                      </span>
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ol>
+          <details className="mt-4 rounded-xl border border-border bg-card lg:hidden">
+            <summary className="cursor-pointer px-3 py-2 text-sm font-medium">
+              Part {section.number} of {RATE_LIMITER_SECTIONS.length} · {section.shortTitle}
+            </summary>
+            <CourseOutline index={index} sectionId={section.id} className="px-2 pb-3" />
+          </details>
+          <div className="hidden lg:block">
+            <CourseOutline index={index} sectionId={section.id} />
+          </div>
           <Link
             href="/learn/problems/rate-limiter"
             className="mt-5 inline-flex text-xs font-medium text-primary hover:underline"
@@ -119,6 +90,14 @@ export function RateLimiterCourse({
             {section.intro.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}
+          </div>
+
+          <div className="mt-8">
+            <RateLimiterLessonDiagram
+              kind={section.diagram}
+              interview={section.interview}
+              decided={section.decided}
+            />
           </div>
 
           {section.examples ? (
@@ -159,31 +138,6 @@ export function RateLimiterCourse({
                       {benefit.body}
                     </p>
                   </article>
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          <div className="mt-8">
-            <RateLimiterLessonDiagram
-              kind={section.diagram}
-              interview={section.interview}
-            />
-          </div>
-
-          {section.decided ? (
-            <section className="mt-8 rounded-2xl border border-primary/30 bg-primary/5 p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-                What we locked
-              </p>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                {section.decided.map((item) => (
-                  <div key={item.title}>
-                    <p className="text-sm font-semibold">{item.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                      {item.body}
-                    </p>
-                  </div>
                 ))}
               </div>
             </section>
@@ -321,5 +275,56 @@ export function RateLimiterCourse({
         </main>
       </div>
     </div>
+  );
+}
+
+function CourseOutline({
+  index,
+  sectionId,
+  className,
+}: {
+  index: number;
+  sectionId: string;
+  className?: string;
+}) {
+  return (
+    <ol className={cn("mt-5 space-y-1", className)}>
+      {RATE_LIMITER_SECTIONS.map((item, itemIndex) => {
+        const active = item.id === sectionId;
+        return (
+          <li key={item.id}>
+            <Link
+              href={rateLimiterLessonHref(item.id)}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "flex items-start gap-2.5 rounded-lg px-2 py-2 text-sm",
+                active
+                  ? "bg-primary/10 font-medium text-foreground"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
+              )}
+            >
+              <span
+                className={cn(
+                  "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px]",
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : itemIndex < index
+                      ? "border-primary/50 text-primary"
+                      : "border-border",
+                )}
+              >
+                {itemIndex < index ? <Check className="h-3 w-3" /> : item.number}
+              </span>
+              <span>
+                {item.shortTitle}
+                <span className="block text-[11px] font-normal text-muted-foreground">
+                  {item.minutes} min
+                </span>
+              </span>
+            </Link>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
