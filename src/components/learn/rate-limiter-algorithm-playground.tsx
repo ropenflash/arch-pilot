@@ -25,7 +25,7 @@ export function RateLimiterAlgorithmPlayground() {
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
           Algorithm simulator
         </p>
-        <h2 className="mt-1 text-lg font-semibold">Change the traffic. Watch the consequence.</h2>
+        <h2 className="mt-1 text-lg font-semibold">Send traffic. Watch allow vs wait.</h2>
       </div>
       <div className="overflow-x-auto border-b border-border bg-muted/40 p-1.5">
         <div className="flex min-w-max gap-1">
@@ -114,7 +114,7 @@ function TokenSimulation() {
     <div>
       <AlgorithmIntro
         title="Token bucket"
-        body="Tokens arrive continuously up to a cap. Requests spend tokens immediately, so saved capacity becomes a bounded burst."
+        body="Picture a jar of tickets. New tickets drip in at a steady speed, but the jar has a max size. Each request spends one ticket. If the jar is empty, the request waits."
       />
       <div className="mt-5 grid gap-5 lg:grid-cols-[280px_1fr]">
         <div className="space-y-4">
@@ -240,7 +240,7 @@ function LeakySimulation() {
     <div>
       <AlgorithmIntro
         title="Leaky bucket"
-        body="Requests enter a bounded FIFO queue and leave at a fixed rate. This smooths downstream load, but fresh work waits behind old work."
+        body="Picture a funnel. Requests pour in and drip out at a fixed pace. If the funnel fills up, new requests are dropped. The downstream service never sees a sudden spike."
       />
       <div className="mt-5 grid gap-5 lg:grid-cols-[280px_1fr]">
         <div className="space-y-4">
@@ -310,7 +310,7 @@ function FixedWindowSimulation() {
     <div>
       <AlgorithmIntro
         title="Fixed window"
-        body="One counter belongs to one wall-clock interval. The reset is simple; the boundary creates the surprise."
+        body="Picture a notebook page for this minute. You allow five marks, then flip to a new page. Fill this page, cross the boundary, and fill the next — that is how a burst sneaks through."
       />
       <div className="mt-5 grid gap-5 md:grid-cols-[1fr_auto_1fr] md:items-center">
         <WindowCard title={`Window ${windowId - 1}`} count={previousAccepted} limit={limit} muted />
@@ -385,7 +385,7 @@ function SlidingLogSimulation() {
     <div>
       <AlgorithmIntro
         title="Sliding window log"
-        body="Keep accepted request timestamps inside the last rolling interval. It is accurate because the history is explicit."
+        body="Picture a list of exact times. A new request is allowed only if fewer than five times still sit inside the last minute. Old times fall off as the clock moves."
       />
       <div className="mt-5 rounded-xl border border-border bg-muted/30 p-5">
         <div className="flex flex-wrap items-end justify-between gap-3">
@@ -441,7 +441,7 @@ function SlidingCounterSimulation() {
     <div>
       <AlgorithmIntro
         title="Sliding window counter"
-        body="Estimate the rolling count by weighting the previous fixed window according to how much still overlaps."
+        body="Picture two notebook pages: last minute and this minute. You count a slice of the old page plus all of the new page. Cheaper than storing every time, but it is an estimate."
       />
       <div className="mt-5 grid gap-5 lg:grid-cols-[280px_1fr]">
         <div className="space-y-4">
