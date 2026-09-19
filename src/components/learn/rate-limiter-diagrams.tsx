@@ -200,16 +200,21 @@ function ScopeDiagram({
       ) : (
         <div>
           <p className="text-sm font-semibold">The brief is now locked</p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            {decided.map((item) => (
-              <div key={item.title}>
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
-                  {item.title}
-                </p>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.body}</p>
-              </div>
-            ))}
-          </div>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            Server-side API limiter. Flexible identity. High traffic across many servers. Tell the caller when they are limited.
+          </p>
+          {decided.length ? (
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {decided.map((item) => (
+                <div key={item.title}>
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
+                    {item.title}
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.body}</p>
+                </div>
+              ))}
+            </div>
+          ) : null}
           <button
             type="button"
             onClick={() => {
